@@ -1,0 +1,1 @@
+I was testing the RESTful Booker API. In the RESTful Booker API, I have noticed that for the POST request, we have POST request, we have PUT request, DELETE request, GET request, and all of them request. In the POST request, I have figured out that error message was not accurate in this case. 
