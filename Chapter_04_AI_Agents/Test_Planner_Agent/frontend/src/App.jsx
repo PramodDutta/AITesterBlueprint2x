@@ -15,10 +15,16 @@ function App() {
     const saved = localStorage.getItem('blast_jira');
     return saved ? JSON.parse(saved) : { url: 'https://yourcompany.atlassian.net', email: '', token: '' }
   })
+  const [ado, setAdo] = useState(() => {
+    const saved = localStorage.getItem('blast_ado');
+    return saved ? JSON.parse(saved) : { orgUrl: 'https://dev.azure.com/your-org', pat: '' }
+  })
+  const [activeSource, setActiveSource] = useState('jira')
   const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('blast_history') || '[]'))
 
   useEffect(() => localStorage.setItem('blast_llm', JSON.stringify(llm)), [llm])
   useEffect(() => localStorage.setItem('blast_jira', JSON.stringify(jira)), [jira])
+  useEffect(() => localStorage.setItem('blast_ado', JSON.stringify(ado)), [ado])
   useEffect(() => localStorage.setItem('blast_history', JSON.stringify(history)), [history])
 
   const [ticketId, setTicketId] = useState('')
@@ -101,8 +107,8 @@ function App() {
   }
 
   const generatePlan = async () => {
-    if (!ticketId || !jira.email || !jira.token) {
-      setStatus({ type: 'error', text: 'Please fill Jira details and Ticket ID' })
+    if (!ticketId) {
+      setStatus({ type: 'error', text: 'Please fill Ticket ID' })
       return;
     }
     setStatus({ type: 'loading', text: 'Agent is generating your test plan... (This may take a minute)' })
@@ -111,14 +117,15 @@ function App() {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jira, llm, ticket_id: ticketId, context })
+        body: JSON.stringify({ activeSource, jira, ado, llm, ticket_id: ticketId, context })
       });
       const data = await res.json();
       if(res.ok) {
         setStatus({ type: 'success', text: 'Plan generated successfully! ' + data.file_path })
         setGeneratedMarkdown(data.markdown)
         setPageTitle(`${ticketId} - Test Plan`)
-        setConfluenceUrl(jira.url.includes('atlassian.net') && !jira.url.includes('/wiki') ? `${jira.url}/wiki` : jira.url)
+        const computedConfluenceUrl = activeSource === 'ado' ? '' : (jira.url.includes('atlassian.net') && !jira.url.includes('/wiki') ? `${jira.url}/wiki` : jira.url);
+        setConfluenceUrl(computedConfluenceUrl)
         setHistory([{ id: ticketId, date: new Date().toLocaleString(), markdown: data.markdown }, ...history].slice(0, 20))
         setStep(4)
       }

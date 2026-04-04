@@ -19,6 +19,25 @@ async function fetchJiraAuth(url, email, token, endpoint) {
   });
 }
 
+// Helper: fetch ADO
+async function testAdoAuth(orgUrl, pat) {
+  const auth = Buffer.from(`:${pat}`).toString('base64');
+  const fetchUrl = `${orgUrl.replace(/\/$/, '')}/_apis/projects?api-version=7.0`;
+  return fetch(fetchUrl, {
+    method: 'GET',
+    headers: { 'Authorization': `Basic ${auth}`, 'Accept': 'application/json' }
+  });
+}
+
+async function fetchAdoAuth(orgUrl, pat, workItemId) {
+  const auth = Buffer.from(`:${pat}`).toString('base64');
+  const fetchUrl = `${orgUrl.replace(/\/$/, '')}/_apis/wit/workitems/${workItemId}?api-version=7.0`;
+  return fetch(fetchUrl, {
+    method: 'GET',
+    headers: { 'Authorization': `Basic ${auth}`, 'Accept': 'application/json' }
+  });
+}
+
 // 1. Test Jira
 app.post('/api/test-jira', async (req, res) => {
   try {
@@ -56,16 +75,65 @@ app.post('/api/fetch-jira', async (req, res) => {
   }
 });
 
+// ADO Endpoints
+app.post('/api/test-ado', async (req, res) => {
+  try {
+    const { orgUrl, pat } = req.body;
+    const response = await testAdoAuth(orgUrl, pat);
+    if (response.ok) {
+      return res.json({ success: true, message: "Connected to Azure DevOps!" });
+    } else {
+      const text = await response.text();
+      return res.status(400).json({ detail: `ADO Auth failed: ${response.status} ${text}` });
+    }
+  } catch (err) {
+    return res.status(500).json({ detail: err.message });
+  }
+});
+
+app.post('/api/fetch-ado', async (req, res) => {
+  try {
+    const { ado, ticket_id } = req.body;
+    const response = await fetchAdoAuth(ado.orgUrl, ado.pat, ticket_id);
+    if (response.ok) {
+      const data = await response.json();
+      const fields = data.fields || {};
+      return res.json({
+        ticket_id: data.id,
+        title: fields['System.Title'] || '',
+        description: fields['System.Description'] || fields['System.History'] || ''
+      });
+    } else {
+      const text = await response.text();
+      return res.status(400).json({ detail: `Failed to fetch ADO Item ${ticket_id}: ${response.status}` });
+    }
+  } catch (err) {
+    return res.status(500).json({ detail: err.message });
+  }
+});
+
 // 3. Generate
 app.post('/api/generate', async (req, res) => {
   try {
-    const { jira, llm, ticket_id, context } = req.body;
-    // 1. Fetch Jira Ticket
-    const ticketRes = await fetchJiraAuth(jira.url, jira.email, jira.token, `/rest/api/2/issue/${ticket_id}`);
-    if (!ticketRes.ok) return res.status(400).json({ detail: 'Failed to fetch Jira ticket.' });
-    const ticketData = await ticketRes.json();
-    const title = ticketData.fields.summary || '';
-    const desc = typeof ticketData.fields.description === 'string' ? ticketData.fields.description : JSON.stringify(ticketData.fields.description || '');
+    const { activeSource, jira, ado, llm, ticket_id, context } = req.body;
+    
+    let title = '';
+    let desc = '';
+    
+    // 1. Fetch Ticket Information
+    if (activeSource === 'ado') {
+      const ticketRes = await fetchAdoAuth(ado.orgUrl, ado.pat, ticket_id);
+      if (!ticketRes.ok) return res.status(400).json({ detail: 'Failed to fetch ADO ticket.' });
+      const ticketData = await ticketRes.json();
+      title = (ticketData.fields || {})['System.Title'] || '';
+      desc = (ticketData.fields || {})['System.Description'] || '';
+    } else {
+      const ticketRes = await fetchJiraAuth(jira.url, jira.email, jira.token, `/rest/api/2/issue/${ticket_id}`);
+      if (!ticketRes.ok) return res.status(400).json({ detail: 'Failed to fetch Jira ticket.' });
+      const ticketData = await ticketRes.json();
+      title = ticketData.fields.summary || '';
+      desc = typeof ticketData.fields.description === 'string' ? ticketData.fields.description : JSON.stringify(ticketData.fields.description || '');
+    }
     
     // 2. Format Prompt
     // Hardcode fallback SOP string specifically to avoid Vercel FS pathing issues during execution
