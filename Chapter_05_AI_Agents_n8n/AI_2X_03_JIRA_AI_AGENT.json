@@ -1,0 +1,165 @@
+{
+  "name": "AI_2X_03_JIRA_AI_AGENT",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -416,
+        -368
+      ],
+      "id": "c0cb1e7c-75f0-412b-9be8-a186ecce3c1e",
+      "name": "When chat message received",
+      "webhookId": "02161ef6-2448-434e-a9ab-102aae88f6f7"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant, use the tool to create a bug"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -96,
+        -368
+      ],
+      "id": "28be30cc-03b5-4945-a7e9-0ce12bead861",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -192
+      ],
+      "id": "1d44ae93-38ba-4e04-906e-7b450a0d4ad4",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "9E2tVv6tTj6um38g",
+          "name": "Groq n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        -160
+      ],
+      "id": "50c63233-3d2d-4ba3-9cb8-c8cbbcaefdc5",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10033",
+          "mode": "list",
+          "cachedResultName": "VWO Project"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10042",
+          "mode": "list",
+          "cachedResultName": "Bug"
+        },
+        "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.jiraTool",
+      "typeVersion": 1,
+      "position": [
+        48,
+        -144
+      ],
+      "id": "5773c082-5675-4a80-a6be-713c71ec60e0",
+      "name": "Create an issue in Jira Software",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "L77nyfUEqMEoGHWq",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an issue in Jira Software": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5a66a5a8-62d5-46f2-8e4c-ca9e30adf8aa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c5b7d69aef09d65f6d843dbeb419620198dba9448e9bb3bd16f598faf54bf9f9"
+  },
+  "id": "HqICvzMxSGd3hI8m",
+  "tags": [
+    {
+      "updatedAt": "2026-04-04T03:44:19.134Z",
+      "createdAt": "2026-04-04T03:44:19.134Z",
+      "id": "ESE14Ke2DofKFU2b",
+      "name": "AI2X"
+    }
+  ]
+}
