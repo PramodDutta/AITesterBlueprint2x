@@ -1,0 +1,526 @@
+{
+  "name": "AI_2X_068_Automated LinkedIn Content Creation",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -560,
+        -160
+      ],
+      "id": "54338337-227b-4365-bd8a-d033eb4d2cd1",
+      "name": "When chat message received",
+      "webhookId": "e915c390-8d4d-4aa4-93e8-36eaf1d34fea"
+    },
+    {
+      "parameters": {
+        "content": "Schedule Trigger - Which run at a particular time",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -864,
+        64
+      ],
+      "typeVersion": 1,
+      "id": "06c8769c-79e6-4043-9809-30035260391e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "### Generate the Topic",
+        "height": 416,
+        "width": 464
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -336,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "2ccd7441-e3b9-49fe-a68c-e6b8fb494f9a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "### Take the Topic and Create Linkedin POST",
+        "height": 416,
+        "width": 884
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        352,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "f37120de-f290-4c13-a018-a9bb7517839b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"title\" : \"example\",\n  \"rationale\"  : \"example\",\n  \"hook\" : \"example\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        64
+      ],
+      "id": "9171b52e-bcbe-4fd7-9b0d-27dd2be5b725",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        208
+      ],
+      "id": "f5dc69c9-883a-4159-a405-9526730e40bc",
+      "name": "Google Gemini Flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GXa60tRwnTIx4LIE",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-pro-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        32
+      ],
+      "id": "b1e489f2-c7de-49d1-b3ae-bca2fd015ddf",
+      "name": "Google Gemini 3.1 PRO",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GXa60tRwnTIx4LIE",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "13hUUy6UpbXFtKU-uuveOA6fXF5UfNiYDT_jhciBf_Ew",
+          "mode": "list",
+          "cachedResultName": "Content Generated Linkedin",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13hUUy6UpbXFtKU-uuveOA6fXF5UfNiYDT_jhciBf_Ew/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13hUUy6UpbXFtKU-uuveOA6fXF5UfNiYDT_jhciBf_Ew/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Title": "={{ $('Step 1 - Topic Creator AI Agent').item.json.output.title }}",
+            "Rational": "={{ $('Step 1 - Topic Creator AI Agent').item.json.output.rationale }}",
+            "Hook": "={{ $('Step 1 - Topic Creator AI Agent').item.json.output.hook }}",
+            "Status": "Draft",
+            "Date": "={{ $today }}",
+            "Content": "={{ $json.output.content }}",
+            "Image_Prompt": "={{ $json.output.image_prompt }}"
+          },
+          "matchingColumns": [
+            "Title"
+          ],
+          "schema": [
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Rational",
+              "displayName": "Rational",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hook",
+              "displayName": "Hook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Image_Prompt",
+              "displayName": "Image_Prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        496,
+        -128
+      ],
+      "id": "f298c6fc-2331-4e8d-95a4-7b8c996777e5",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "caTviu6bUWqfmXO7",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-pro-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        32
+      ],
+      "id": "f1e13878-2e61-4002-ac21-238a093ed839",
+      "name": "Google Gemini 3.1 PRO1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GXa60tRwnTIx4LIE",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are a Senior QA architect and industry analyst writing in 2026.\n\nYour task is to generate ONLY ONE topic about:\n\n\"Software Testing in 2026\"\n\nConstraints:\n\n- Choose the single most impactful and future-defining shift.\n- Avoid generic themes unless you provide a deeply unique angle.\n- The topic must be bold, specific, and insight-driven.\n- It should reflect a real structural change in the industry (not surface-level trends).\n- The topic must be strong enough to anchor a keynote talk.\n- \n-  You can talk about Playwright AI agents, MCP, Playwright CLI, AI agents, n8n, LangFlow, RAG, MCP, Crew.ai, LLM evaluation  \nOutput format:\n\n1. Title (clear, bold, thought-provoking)\n2. One-sentence thesis (strong and definitive)\n3. Why this topic matters in 2026 (5–7 bullet points with reasoning)\nDo NOT generate multiple topics.\nDo NOT provide alternatives.\nCommit to one topic and defend it.\n\ndon't` make a complex topic, keep it very simple.`\n\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -224,
+        -144
+      ],
+      "id": "fbb023bb-3474-4f25-9380-611cb0850196",
+      "name": "Step 1 - Topic Creator AI Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a high-performing LinkedIn content strategist and B2B copywriter.\n\nInput:\n\n- Title: {{ $json.output.title }}\n- Rationale: {{ $json.output.rationale }}\n- Suggested Hook: {{ $json.output.hook }}\nYour task:\nCreate a high-engagement LinkedIn post based on the inputs.\n\nRequirements:\n\n1. Start with the provided hook (optimize it if necessary for stronger scroll-stopping impact).\n2. Expand the core idea clearly and persuasively.\n3. Maintain a strong narrative flow (problem → shift → insight → implication).\n4. Keep it practical and insight-driven (no fluff or generic motivation).\n5. Use short paragraphs for readability.\n6. Include 3–5 sharp bullet points if helpful.\n7. End with:\n    - A strong takeaway or forward-looking statement\n    - A conversation-driving question\n\nTone:\n\n- Authoritative but conversational\n- Insightful and slightly bold\n- Written for professionals in tech/QA/engineering leadership\nLength:\n\n- 150–300 words\nAfter the post, also provide:\n\n\nGenerate a Image_Prpmpt also like below example : \n\nExample of Image_Prpmpt : A vibrant, modern cartoon-style tech illustration with a polished YouTube-thumbnail aesthetic. The scene features a clean UI dashboard inside a glowing browser window, with rounded corners and soft shadows. Use a neon gradient color palette (greens, purples, oranges) with subtle grid background.\n\nInclude bold, glossy UI cards and metrics panels with high contrast text, soft glow effects, and smooth gradients. Add playful floating icons around the scene to reinforce a tech/AI theme.\n\nOn one side, include a friendly cartoon avatar character with a big smile, expressive eyes, and simplified features, pointing toward the interface. Character should be semi-3D, vector-like, with soft shading and thick outlines.\n\nLighting should be soft but vibrant with glow accents and subtle highlights. Overall composition should feel dynamic, clean, and slightly futuristic.\n\nStyle inspired by modern SaaS marketing visuals, animated explainer thumbnails, and polished vector illustrations. Highly detailed, sharp, colorful, and engaging.\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        160,
+        -160
+      ],
+      "id": "8d69921b-7bb8-4080-ad7c-2b229d3d446c",
+      "name": "Step 2- Take Topic and Generate Linkedin Post AI Agent"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"content\" : \"Content of the generated LinkedIn post.\",\n  \"image_prompt\" : \" Image that the AI should generate.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        48
+      ],
+      "id": "17b3afda-1bea-4e30-a5aa-ce1a36ba94cd",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-pro-image-preview",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3-pro-image-preview (Nano Banana Pro)"
+        },
+        "prompt": "={{ $('Step 2- Take Topic and Generate Linkedin Post AI Agent').item.json.output.image_prompt }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        32
+      ],
+      "id": "e156fd03-b214-4970-aeb1-5dd11d19c7d4",
+      "name": "Generate an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GXa60tRwnTIx4LIE",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "uploadText",
+        "user": "Prrammod",
+        "platform": [
+          "linkedin"
+        ],
+        "title": "={{ $('Step 2- Take Topic and Generate Linkedin Post AI Agent').item.json.output.content }}"
+      },
+      "type": "n8n-nodes-upload-post.uploadPost",
+      "typeVersion": 1,
+      "position": [
+        960,
+        -176
+      ],
+      "id": "49fdc122-5eba-46a0-a4f9-6fb2449ddf71",
+      "name": "Upload a text post",
+      "credentials": {
+        "uploadPostApi": {
+          "id": "9e9J1F9bgMuEeKr8",
+          "name": "Upload Post account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "user": "Prrammod",
+        "platform": [
+          "linkedin"
+        ],
+        "title": "={{ $('Step 2- Take Topic and Generate Linkedin Post AI Agent').item.json.output.content }}",
+        "photos": "data"
+      },
+      "type": "n8n-nodes-upload-post.uploadPost",
+      "typeVersion": 1,
+      "position": [
+        896,
+        32
+      ],
+      "id": "3d0cd762-47df-4211-99a7-c5973ca44475",
+      "name": "Upload photos",
+      "credentials": {
+        "uploadPostApi": {
+          "id": "9e9J1F9bgMuEeKr8",
+          "name": "Upload Post account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -528,
+        32
+      ],
+      "id": "8430a22d-db54-42ce-aa07-a4adb4590211",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 1 - Topic Creator AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini 3.1 PRO": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Step 1 - Topic Creator AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini 3.1 PRO1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Step 2- Take Topic and Generate Linkedin Post AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 1 - Topic Creator AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Step 2- Take Topic and Generate Linkedin Post AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 2- Take Topic and Generate Linkedin Post AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 2- Take Topic and Generate Linkedin Post AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Upload photos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Step 1 - Topic Creator AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0682720f-17af-4b88-98d3-114e3b3c76a4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc2f858738a69bc611d33bc3fb9b5ea59609d693c9968efe048db5f39d555b7b"
+  },
+  "id": "POeiA0h9QYVQ2xJ1",
+  "tags": []
+}
