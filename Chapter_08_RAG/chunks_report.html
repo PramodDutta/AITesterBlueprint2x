@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>RAG Chunking Report - The Testing Academy</title>
+<style>
+  body {
+    font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    background: #0f172a;
+    color: #e2e8f0;
+    line-height: 1.5;
+  }
+  h1 { color: #38bdf8; margin-bottom: 4px; }
+  .summary {
+    background: #1e293b;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    border-left: 4px solid #38bdf8;
+  }
+  .chunk {
+    background: #1e293b;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+  .chunk-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .badge {
+    background: #38bdf8;
+    color: #0f172a;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .meta { color: #94a3b8; font-size: 13px; }
+  pre.chunk-text {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 12px 14px;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 14px;
+    border: 1px solid #334155;
+  }
+  .embedding {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #cbd5e1;
+  }
+  .embedding code {
+    background: #0f172a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #fbbf24;
+  }
+</style>
+</head>
+<body>
+  <h1>RAG Chunking Report</h1>
+  <p>Document: <em>The Story of Promo and The Testing Academy</em></p>
+
+  <div class="summary">
+    <strong>Total chunks:</strong> 9<br/>
+    <strong>Chunk size:</strong> 300 chars (with 50 char overlap)<br/>
+    <strong>Embedding model:</strong> nomic-embed-text<br/>
+    <strong>Vector dimensions:</strong> 768
+  </div>
+
+  
+        <div class="chunk">
+          <div class="chunk-header">
+            <span class="badge">Chunk 1</span>
+            <span class="meta">300 chars &middot; 768 dims</span>
+          </div>
+          <pre class="chunk-text">The Story of Promo and The Testing Academy
+
+Promo is the founder of The Testing Academy, an online learning platform dedicated to software testers around the world. He started The Testing Academy with a simple mission: make high quality testing education accessible, practical, and fun for every test</pre>
+          <div class="embedding">
+            <strong>Embedding preview (first 8 of 768):</strong>
+            <code>[-0.1135, +1.1039, -3.3925, -0.0242, +1.6900, +0.2568, +0.7368, -0.9693, ...]</code>
+          </div>
+        </div>
+        
+        <div class="chunk">
+          <div class="chunk-header">
+            <span class="badge">Chunk 2</span>
+            <span class="meta">300 chars &middot; 768 dims</span>
+          </div>
+          <pre class="chunk-text">tion accessible, practical, and fun for every tester, no matter their background or experience level.
+
+In the early days, Promo recorded short YouTube videos from his small home office. He taught beginners how to write their first Selenium script, how to read API responses, and how to think like a t</pre>
+          <div class="embedding">
+            <strong>Embedding preview (first 8 of 768):</strong>
+            <code>[-0.3248, +0.9895, -3.5089, -0.1773, +0.9463, -0.2076, +0.8853, -0.6306, ...]</code>
+          </div>
+        </div>
+        
+        <div class="chunk">
+          <div class="chunk-header">
+            <span class="badge">Chunk 3</span>
+            <span class="meta">300 chars &middot; 768 dims</span>
+          </div>
+          <pre class="chunk-text">w to read API responses, and how to think like a tester rather than just clicking buttons. The videos were rough, the audio was not perfect, but the ideas were clear and the energy was real. Slowly, a small community of testers started gathering around the channel.
+
+As the community grew, Promo laun</pre>
+          <div class="embedding">
+            <strong>Embedding preview (first 8 of 768):</strong>
+            <code>[+0.0833, +0.7552, -3.2862, -0.4079, +2.1259, -0.6082, +1.0075, -0.5096, ...]</code>
+          </div>
+        </div>
+        
+        <div class="chunk">
+          <div class="chunk-header">
+            <span class="badge">Chunk 4</span>
+            <span class="meta">300 chars &middot; 768 dims</span>
+          </div>
+          <pre class="chunk-text">nd the channel.
+
+As the community grew, Promo launched The Testing Academy website. He published structured courses on Selenium with Java, Playwright, Rest Assured, Postman, Cypress, and Performance Testing with JMeter. He also wrote long blog posts breaking down complex topics like Page Object Mode</pre>
+          <div class="embedding">
+            <strong>Embedding preview (first 8 of 768):</strong>
+            <code>[-0.2002, +1.4242, -3.3279, -0.7404, +1.0092, -0.7597, +0.3132, -0.3317, ...]</code>
+          </div>
+        </div>
+        
+        <div class="chunk">
+          <div class="chunk-header">
+            <span class="badge">Chunk 5</span>
+            <span class="meta">300 chars &middot; 768 dims</span>
+          </div>
+          <pre class="chunk-text">breaking down complex topics like Page Object Model, test data management, CI CD pipelines, and flaky test debugging.
+
+Promo believes that testing is not just about finding bugs. It is about asking better questions, understanding users, and protecting the trust people place in software. He often tel</pre>
+          <div class="embedding">
+            <strong>Embedding preview (first 8 of 768):</strong>
+            <code>[+0.5535, +0.7739, -3.0431, -0.4314, +2.0857, +0.0233, +0.7057, -1.1751, ...]</code>
+          </div>
+        </div>
+        
+        <div class="chunk">
+          <div class="chunk-header">
+            <span class="badge">Chunk 6</span>
+            <span class="meta">300 chars &middot; 768 dims</span>
+          </div>
+          <pre class="chunk-text">g the trust people place in software. He often tells his students that a great tester is part detective, part designer, and part teacher. This philosophy shaped every course, workshop, and bootcamp at The Testing Academy.
+
+In recent years, Promo became deeply interested in Artificial Intelligence an</pre>
+          <div class="embedding">
+            <strong>Embedding preview (first 8 of 768):</strong>
+            <code>[-0.5778, +1.3715, -2.9176, -0.2243, +1.3848, +0.2207, +0.6792, -0.7809, ...]</code>
+          </div>
+        </div>
+        
+        <div class="chunk">
+          <div class="chunk-header">
+            <span class="badge">Chunk 7</span>
+            <span class="meta">300 chars &middot; 768 dims</span>
+          </div>
+          <pre class="chunk-text">me deeply interested in Artificial Intelligence and how it changes the future of testing. He started teaching AI Agents, Vibe Coding, and Retrieval Augmented Generation to testers who wanted to stay ahead of the curve. He believes that the testers who learn to combine traditional testing skills with</pre>
+          <div class="embedding">
+            <strong>Embedding preview (first 8 of 768):</strong>
+            <code>[-0.2429, +1.0843, -3.6559, -0.1097, +1.6525, +0.3834, +0.7943, -0.6897, ...]</code>
+          </div>
+        </div>
+        
+        <div class="chunk">
+          <div class="chunk-header">
+            <span class="badge">Chunk 8</span>
+            <span class="meta">299 chars &middot; 768 dims</span>
+          </div>
+          <pre class="chunk-text">o learn to combine traditional testing skills with AI tools will lead the next decade of quality engineering.
+
+Today, The Testing Academy is more than a website. It is a global community of curious testers who learn together, build projects together, and support each other on LinkedIn, YouTube, and</pre>
+          <div class="embedding">
+            <strong>Embedding preview (first 8 of 768):</strong>
+            <code>[-0.0668, +1.0902, -3.6416, +0.1395, +1.7622, -0.3043, +0.6407, -0.3340, ...]</code>
+          </div>
+        </div>
+        
+        <div class="chunk">
+          <div class="chunk-header">
+            <span class="badge">Chunk 9</span>
+            <span class="meta">203 chars &middot; 768 dims</span>
+          </div>
+          <pre class="chunk-text">and support each other on LinkedIn, YouTube, and Discord. Promo continues to teach, write, and build, one chapter at a time, helping testers around the world become confident, modern, AI ready engineers.</pre>
+          <div class="embedding">
+            <strong>Embedding preview (first 8 of 768):</strong>
+            <code>[-0.4515, +0.0257, -3.9889, -0.0196, +1.6034, +0.0025, -0.0520, -0.8210, ...]</code>
+          </div>
+        </div>
+        
+</body>
+</html>

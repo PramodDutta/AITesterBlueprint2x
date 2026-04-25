@@ -1,0 +1,13 @@
+The Story of Promo and The Testing Academy
+
+Promo is the founder of The Testing Academy, an online learning platform dedicated to software testers around the world. He started The Testing Academy with a simple mission: make high quality testing education accessible, practical, and fun for every tester, no matter their background or experience level.
+
+In the early days, Promo recorded short YouTube videos from his small home office. He taught beginners how to write their first Selenium script, how to read API responses, and how to think like a tester rather than just clicking buttons. The videos were rough, the audio was not perfect, but the ideas were clear and the energy was real. Slowly, a small community of testers started gathering around the channel.
+
+As the community grew, Promo launched The Testing Academy website. He published structured courses on Selenium with Java, Playwright, Rest Assured, Postman, Cypress, and Performance Testing with JMeter. He also wrote long blog posts breaking down complex topics like Page Object Model, test data management, CI CD pipelines, and flaky test debugging.
+
+Promo believes that testing is not just about finding bugs. It is about asking better questions, understanding users, and protecting the trust people place in software. He often tells his students that a great tester is part detective, part designer, and part teacher. This philosophy shaped every course, workshop, and bootcamp at The Testing Academy.
+
+In recent years, Promo became deeply interested in Artificial Intelligence and how it changes the future of testing. He started teaching AI Agents, Vibe Coding, and Retrieval Augmented Generation to testers who wanted to stay ahead of the curve. He believes that the testers who learn to combine traditional testing skills with AI tools will lead the next decade of quality engineering.
+
+Today, The Testing Academy is more than a website. It is a global community of curious testers who learn together, build projects together, and support each other on LinkedIn, YouTube, and Discord. Promo continues to teach, write, and build, one chapter at a time, helping testers around the world become confident, modern, AI ready engineers.

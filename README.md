@@ -103,4 +103,50 @@ flowchart LR
 
 ---
 
+## 📖 Chapter 8: Retrieval Augmented Generation (RAG)
+
+**Directory:** `Chapter_08_RAG/`
+
+In this chapter, we introduce **Retrieval Augmented Generation (RAG)** — the technique that grounds an LLM in your own documents instead of relying purely on its training data. We start with the most important building block of any RAG pipeline: **chunking and embeddings**. Using a small story document about *Promo and The Testing Academy*, we split the text into overlapping chunks and convert each chunk into a 768-dimensional vector using the **Nomic Embed** model running locally through **Ollama**.
+
+### Chapter 8 Learning Path
+
+```mermaid
+flowchart LR
+    R1(What is RAG?) --> R2(Document Loading)
+    R2 --> R3(Chunking with Overlap)
+    R3 --> R4(Embeddings via Nomic Embed)
+    R4 --> R5{Demo: Visualize Chunks in HTML}
+
+    style R1 fill:#fce4ec,stroke:#880e4f
+    style R2 fill:#fce4ec,stroke:#880e4f
+    style R3 fill:#fce4ec,stroke:#880e4f
+    style R4 fill:#fce4ec,stroke:#880e4f
+    style R5 fill:#ede7f6,stroke:#4527a0,stroke-width:2px
+```
+
+### Chapter 8 Curriculum & Demo
+
+| Type | Folder / File | Description |
+| :---: | :--- | :--- |
+| **📄 Document** | `promo_story.txt` | A small narrative document about Promo and The Testing Academy, used as the source corpus for the RAG demo. |
+| **🐍 Python** | `rag_chunking.py` | Loads the document, performs sliding-window chunking (300 chars with 50 char overlap), generates embeddings via `nomic-embed-text` on Ollama, prints each chunk + a preview of its 768-dim vector, and writes a styled HTML report. |
+| **🌐 HTML** | `chunks_report.html` | A visual, browser-friendly report showing every chunk side by side with its embedding preview — great for understanding what chunking actually looks like. |
+
+### Prerequisites
+
+1. Install [Ollama](https://ollama.com)
+2. Pull the embedding model: `ollama pull nomic-embed-text`
+3. Install the Python dependency: `pip install requests`
+
+### Run It
+
+```bash
+cd Chapter_08_RAG
+python3 rag_chunking.py
+# then open chunks_report.html in your browser
+```
+
+---
+
 *Continue following this repository for future chapters exploring deeper AI integrations!*
