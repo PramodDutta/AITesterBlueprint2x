@@ -1,0 +1,5 @@
+chromadb>=1.5
+pypdf>=6.0
+flask>=3.0
+requests>=2.30
+python-dotenv>=1.0
