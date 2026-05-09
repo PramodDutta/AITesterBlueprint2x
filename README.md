@@ -125,13 +125,28 @@ flowchart LR
     style R5 fill:#ede7f6,stroke:#4527a0,stroke-width:2px
 ```
 
-### Chapter 8 Curriculum & Demo
+### Chapter 8 Curriculum, Demos & Projects
 
 | Type | Folder / File | Description |
 | :---: | :--- | :--- |
 | **📄 Document** | `promo_story.txt` | A small narrative document about Promo and The Testing Academy, used as the source corpus for the RAG demo. |
 | **🐍 Python** | `rag_chunking.py` | Loads the document, performs sliding-window chunking (300 chars with 50 char overlap), generates embeddings via `nomic-embed-text` on Ollama, prints each chunk + a preview of its 768-dim vector, and writes a styled HTML report. |
 | **🌐 HTML** | `chunks_report.html` | A visual, browser-friendly report showing every chunk side by side with its embedding preview — great for understanding what chunking actually looks like. |
+| **🧪 Demo** | `Basic_RAG_EXPLAIN/` | End-to-end Basic RAG: ChromaDB + Nomic Embed + Groq, exposed through a small Flask UI. |
+| **🧪 Demo** | `Advance_RAG_EXPLAIN/` | Advanced RAG with Qdrant vector store, ingestion pipeline, and a Flask app over the VWO test case corpus. |
+| **🚀 Project** | `LangFlows_RAG/` | **RAG over QA Test Case Repository** (LangFlow). Naive RAG with row-level chunking on a 479-TC CSV — generation mode for new TCs from Jira, regression analysis mode with metadata filters. |
+| **🚀 Project** | `n8n_Flows_RAG/` | n8n workflows for advanced RAG over a 5,000-TC corpus — alternative orchestration of the same QA RAG use case. |
+
+### Featured Project — RAG over QA Test Case Repository
+
+Located in `Chapter_08_RAG/LangFlows_RAG/`. Builds a RAG system over a QA test case CSV (479 TCs across modules: Reports, Editor, Admin, Mobile, Funnels, AB Testing).
+
+- **Per-row indexing**: 1 test case = 1 chunk + structured metadata (`tc_id`, `jira_id`, `module`, `priority`, `severity`, `labels`, `sprint`, `status`, `owner`).
+- **Two retrieval modes**: *Generation* (Jira ID → LLM drafts new TC from K similar exemplars) and *Regression Analysis* (module/priority/sprint query → relevant TCs + gap analysis).
+- **Hybrid search**: vector similarity + metadata filters (`module=X`, `status=Active`, `priority IN (P0, P1)`).
+- **Outcomes**: 10× faster regression scoping, consistent format for new TCs, natural-language search over a living test repo (no SQL/JQL).
+
+See `Chapter_08_RAG/LangFlows_RAG/README.md` for full architecture, QA value table, and run instructions.
 
 ### Prerequisites
 
