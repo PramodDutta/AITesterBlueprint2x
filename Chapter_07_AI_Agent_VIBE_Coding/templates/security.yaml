@@ -1,0 +1,15 @@
+name: Security Testing Template
+description: Security-focused test coverage
+categories:
+  - Security
+  - Negative
+  - Edge
+depth: deep
+tone: security-focused
+rules:
+  - Generate a minimum of 5 test cases.
+  - Test for SQL injection, XSS, and CSRF.
+  - Validate authentication and authorization.
+  - Check input sanitization.
+  - Test for data exposure risks.
+  - Include privilege escalation scenarios.

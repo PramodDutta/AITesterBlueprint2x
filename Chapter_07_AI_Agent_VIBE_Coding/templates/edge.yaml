@@ -1,0 +1,14 @@
+name: Edge Case Testing Template
+description: Edge and boundary condition testing
+categories:
+  - Edge
+  - Boundary
+  - Negative
+depth: deep
+tone: analytical
+rules:
+  - Generate a minimum of 5 test cases.
+  - Focus on edge cases and boundary conditions.
+  - Include null/empty/max length inputs.
+  - Test concurrency and race conditions if applicable.
+  - Include unusual user behaviors.

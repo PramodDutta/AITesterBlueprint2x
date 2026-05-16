@@ -1,0 +1,85 @@
+{
+    "data": {
+        "nodes": [
+            {
+                "id": "chat-input",
+                "type": "ChatInput",
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "data": {
+                    "node": {
+                        "template": {
+                            "input_value": ""
+                        }
+                    }
+                }
+            },
+            {
+                "id": "api-request",
+                "type": "APIRequest",
+                "position": {
+                    "x": 300,
+                    "y": 0
+                },
+                "data": {
+                    "node": {
+                        "template": {
+                            "method": "GET",
+                            "url": "https://bugzz.atlassian.net/rest/api/3/issue/{input_value}",
+                            "headers": {
+                                "Accept": "application/json"
+                            },
+                            "auth_type": "basic",
+                            "username": "{{JIRA_EMAIL}}",
+                            "password": "{{JIRA_API_TOKEN}}"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "custom-parser",
+                "type": "PythonFunction",
+                "position": {
+                    "x": 600,
+                    "y": 0
+                },
+                "data": {
+                    "node": {
+                        "template": {
+                            "code": "def run(data):\n    return data['fields']['description']"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "chat-output",
+                "type": "ChatOutput",
+                "position": {
+                    "x": 900,
+                    "y": 0
+                },
+                "data": {
+                    "node": {
+                        "template": {}
+                    }
+                }
+            }
+        ],
+        "edges": [
+            {
+                "source": "chat-input",
+                "target": "api-request"
+            },
+            {
+                "source": "api-request",
+                "target": "custom-parser"
+            },
+            {
+                "source": "custom-parser",
+                "target": "chat-output"
+            }
+        ]
+    }
+}

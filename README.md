@@ -201,4 +201,59 @@ See `Chapter_09_Project_QACopilot/README.md` for run instructions and `CLAUDE.md
 
 ---
 
+## 📖 Chapter 10: MCP Basics — Playwright MCP
+
+**Directory:** `Chapter_10_MCP_Basics/`
+
+This chapter introduces the **Model Context Protocol (MCP)** — an open standard that lets LLMs drive external tools through a uniform interface. We use **Playwright MCP** (`microsoft/playwright-mcp`) to let an AI agent control a real browser: navigate, snapshot accessibility tree, type, click, screenshot, capture errors. The chapter records a hands-on walkthrough against `app.vwo.com` (negative-login scenario) and emits an idiomatic Playwright spec from the captured trace.
+
+### Chapter 10 Learning Path
+
+```mermaid
+flowchart LR
+    M1(What is MCP?) --> M2(Install Playwright MCP)
+    M2 --> M3(Agent-driven Browser Actions)
+    M3 --> M4(Capture A11y Snapshot & Errors)
+    M4 --> M5{Auto-generate Playwright spec}
+
+    style M1 fill:#fef3c7,stroke:#92400e
+    style M2 fill:#fef3c7,stroke:#92400e
+    style M3 fill:#fef3c7,stroke:#92400e
+    style M4 fill:#fef3c7,stroke:#92400e
+    style M5 fill:#ede7f6,stroke:#4527a0,stroke-width:2px
+```
+
+### Chapter 10 Curriculum
+
+| Type | Folder / File | Description |
+| :---: | :--- | :--- |
+| **📚 Setup** | `Playwright_MCP/Install_MCP.md` | Reference to `github.com/microsoft/playwright-mcp` and install steps for wiring the MCP server into Claude Code / Cursor / VS Code. |
+| **🧪 Demo** | `Playwright_MCP/MCP_Usage.md` | Worked example: negative-login on `app.vwo.com` driven entirely through Playwright MCP — `browser_navigate`, `browser_snapshot`, `browser_type`, `browser_click`, `browser_take_screenshot` — and the resulting Playwright test (`tests/vwo-login.spec.ts`) that captures the `Your email, password, IP address or location did not match` error. |
+
+### Playwright MCP Tools (23 total)
+
+`browser_navigate`, `browser_navigate_back`, `browser_snapshot`, `browser_click`, `browser_type`, `browser_fill_form`, `browser_press_key`, `browser_hover`, `browser_drag`, `browser_drop`, `browser_select_option`, `browser_file_upload`, `browser_handle_dialog`, `browser_wait_for`, `browser_evaluate`, `browser_run_code_unsafe`, `browser_take_screenshot`, `browser_console_messages`, `browser_network_request`, `browser_network_requests`, `browser_tabs`, `browser_resize`, `browser_close`.
+
+### Quick Start
+
+```bash
+# Install MCP server (one-time)
+npx @playwright/mcp@latest --help
+
+# Register in your MCP client (Claude Code / Cursor / VS Code) — see Install_MCP.md
+# Then drive the browser from chat:
+#   "open app.vwo.com, enter wrong credentials, capture the error"
+```
+
+---
+
+## 📖 Bonus: Chapter 6 & 7 — AI Agents
+
+| Chapter | Directory | What's inside |
+| :---: | :--- | :--- |
+| **Ch 6** | `Chapter_06_AI_Agents_LangFlow/` | Exported LangFlow JSON flows — *QA Buddy* agent and a *Bug Report Classifier & Prioritizer* agent. |
+| **Ch 7** | `Chapter_07_AI_Agent_VIBE_Coding/` | Vibe-coded **JIRA AI Agent** (frontend + backend + templates) plus a *Test Case Generator from User Stories* flow. |
+
+---
+
 *Continue following this repository for future chapters exploring deeper AI integrations!*

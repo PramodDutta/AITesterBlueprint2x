@@ -1,0 +1,14 @@
+name: Regression Testing Template
+description: Regression-focused test coverage to catch regressions from code changes
+categories:
+  - Regression
+  - Functional
+  - Integration
+depth: thorough
+tone: professional
+rules:
+  - Generate a minimum of 5 test cases.
+  - Focus on areas that might break due to code changes.
+  - Include boundary conditions.
+  - Test error handling paths.
+  - Validate integrations and data flows.

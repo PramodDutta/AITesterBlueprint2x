@@ -1,0 +1,15 @@
+name: Default Functional Testing Template
+description: Standard functional test generation
+categories:
+  - Functional
+  - Positive
+  - Negative
+  - Edge
+depth: comprehensive
+tone: professional and structured
+rules:
+  - Generate a minimum of 5 test cases.
+  - Cover the main happy path.
+  - Include at least one negative path.
+  - Include an edge case if applicable.
+  - Format output as a JSON conforming to the schema.

@@ -1,0 +1,13 @@
+name: Smoke Testing Template
+description: Quick validation of critical paths
+categories:
+  - Smoke
+  - Positive
+depth: shallow
+tone: concise
+rules:
+  - Generate 5 to 7 test cases.
+  - Focus on critical user paths only.
+  - Keep steps minimal.
+  - Each test should validate a core feature.
+  - Prioritize P0 and P1 scenarios.
