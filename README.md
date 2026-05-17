@@ -229,6 +229,8 @@ flowchart LR
 | :---: | :--- | :--- |
 | **📚 Setup** | `Playwright_MCP/Install_MCP.md` | Reference to `github.com/microsoft/playwright-mcp` and install steps for wiring the MCP server into Claude Code / Cursor / VS Code. |
 | **🧪 Demo** | `Playwright_MCP/MCP_Usage.md` | Worked example: negative-login on `app.vwo.com` driven entirely through Playwright MCP — `browser_navigate`, `browser_snapshot`, `browser_type`, `browser_click`, `browser_take_screenshot` — and the resulting Playwright test (`tests/vwo-login.spec.ts`) that captures the `Your email, password, IP address or location did not match` error. |
+| **🛠️ Build** | `MCP Creation/server.py` | Author your own MCP server with **FastMCP 2.x** — exposes three resources (`resource://greeting`, `data://config`, dynamic `data://user/{user_id}`), one tool (`add`), and two prompt templates (`review_test_case`, `summarize_config`). Runnable over stdio or HTTP. |
+| **🛠️ Build** | `MCP Creation/mcp.py` | Minimal starter example with just two resources — the bare-minimum FastMCP file you grow into `server.py`. |
 
 ### Playwright MCP Tools (23 total)
 
@@ -244,6 +246,82 @@ npx @playwright/mcp@latest --help
 # Then drive the browser from chat:
 #   "open app.vwo.com, enter wrong credentials, capture the error"
 ```
+
+---
+
+### 10.b — MCP Creation (Author Your Own MCP Server with FastMCP)
+
+**Concept:** `FastMCP` is a Python framework that turns plain decorated functions into a Model Context Protocol server — `@mcp.resource` exposes read-only data, `@mcp.tool` exposes callable functions, `@mcp.prompt` exposes reusable prompt templates. Same server can be consumed over stdio (subprocess) or Streamable HTTP.
+
+**Why:** Playwright MCP shows you how to *use* an MCP server. This module shows you how to *build* one — so your own internal QA helpers (test-case lookups, log searchers, env probes) become first-class tools any LLM client can call.
+
+**Q&A — why use this?**
+- **Q: Why not just expose a REST API?** A: MCP gives you tools + resources + prompts + cancellation + streaming over one framed protocol with a standard discovery handshake — every MCP-aware client (Claude Code, Cursor, Inspector) auto-discovers your capabilities. REST gives you none of that.
+- **Q: Why does the file have to be named `server.py` and not `mcp.py`?** A: `mcp.py` shadows the `mcp` PyPI package that FastMCP imports internally, breaking `fastmcp run` with `No server object found`. Always pick a non-shadowing filename.
+- **Q: Stdio vs HTTP — which should I use?** A: Stdio when the client spawns the server as a child process (Claude Code MCP config). HTTP when multiple clients share one long-lived server or you want to debug with curl / Inspector over the network.
+
+```mermaid
+flowchart LR
+    A[server.py<br/>@mcp.resource<br/>@mcp.tool<br/>@mcp.prompt] --> B{fastmcp run}
+    B -->|--transport stdio| C[MCP Inspector<br/>spawns child]
+    B -->|--transport http<br/>--port 8765| D["http://127.0.0.1:8765/mcp"]
+    C --> E[Discover · Call · Read]
+    D --> E
+    E --> F[LLM client<br/>Claude Code · Cursor · Inspector]
+
+    style A fill:#fef3c7,stroke:#92400e
+    style B fill:#cffafe,stroke:#06b6d4
+    style C fill:#e8f5e9,stroke:#2e7d32
+    style D fill:#e8f5e9,stroke:#2e7d32
+    style F fill:#ede7f6,stroke:#4527a0,stroke-width:2px
+```
+
+```python
+# server.py — resources + tool + prompts in one file
+import json
+from fastmcp import FastMCP
+
+mcp = FastMCP(name="DataServer")
+
+@mcp.resource("data://config")
+def get_config() -> str:
+    return json.dumps({"theme": "dark", "version": "1.2.0"})
+
+@mcp.resource("data://user/{user_id}")
+def get_user(user_id: str) -> str:
+    return json.dumps({"id": user_id, "name": f"User {user_id}", "role": "tester"})
+
+@mcp.tool
+def add(a: int, b: int) -> int:
+    """Add two integers and return the sum."""
+    return a + b
+
+@mcp.prompt
+def review_test_case(test_case: str) -> str:
+    return f"You are a senior QA reviewer. Review:\n\n{test_case}"
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+**Run + debug:**
+
+```bash
+# Stdio (Inspector spawns it)
+npx @modelcontextprotocol/inspector \
+  fastmcp run "Chapter_10_MCP_Basics/MCP Creation/server.py:mcp"
+
+# HTTP (long-lived, share between clients)
+fastmcp run "Chapter_10_MCP_Basics/MCP Creation/server.py:mcp" \
+  --transport http --host 127.0.0.1 --port 8765
+# → http://127.0.0.1:8765/mcp
+```
+
+| Decorator | Purpose | Discovery method |
+| :--- | :--- | :--- |
+| `@mcp.resource("uri://...")` | Read-only data (static or templated) | `resources/list` + `resources/read` |
+| `@mcp.tool` | Callable function with typed args | `tools/list` + `tools/call` |
+| `@mcp.prompt` | Parametrised prompt template | `prompts/list` + `prompts/get` |
 
 ---
 
