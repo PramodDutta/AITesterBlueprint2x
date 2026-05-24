@@ -1,0 +1,90 @@
+{
+  "name": "AIQA TOOL - DOM and Screenshot UI Test Generator",
+  "description": "Creates UI test steps, resilient selectors, and Playwright or Cypress code from DOM and screenshot context. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "dom-screenshot-ui-test-generator",
+    "kind": "tool",
+    "category": "Testing Tool",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "framework": "Playwright",
+      "dom": "<label>Email</label><input id=\"email\"><button data-testid=\"continue\">Continue</button>",
+      "flow": "enter email and continue"
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "DOM and Screenshot UI Test Generator Input",
+        "input_type": "textarea",
+        "value": "{\n  \"framework\": \"Playwright\",\n  \"dom\": \"<label>Email</label><input id=\\\"email\\\"><button data-testid=\\\"continue\\\">Continue</button>\",\n  \"flow\": \"enter email and continue\"\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are a UI automation expert. Prefer resilient, user-facing locators and readable tests.\n\nProject: DOM and Screenshot UI Test Generator\nObjective: Help automation engineers generate stable UI tests directly from real pages.\nPrimary use case: A tester provides a DOM snapshot and screenshot notes. The tool returns selectors, assertions, and runnable UI test code.\n\nRequired task:\nGenerate a UI automation test from the supplied DOM, screenshot context, and flow. Include selectors, assertions, code, visual checkpoints, and warnings for fragile areas.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "DOM and Screenshot UI Test Generator Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}

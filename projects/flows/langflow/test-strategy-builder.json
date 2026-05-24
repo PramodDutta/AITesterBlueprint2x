@@ -1,0 +1,92 @@
+{
+  "name": "AIQA AGENT - Test Strategy Builder Agent",
+  "description": "Creates customized test strategies aligned with scope, tech stack, release goals, risks, and team capacity. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "test-strategy-builder",
+    "kind": "agent",
+    "category": "Planning",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "projectName": "Fintech onboarding revamp",
+      "techStack": "React, Node.js, PostgreSQL, REST APIs",
+      "timeline": "4 weeks",
+      "team": "2 manual QA, 1 SDET",
+      "risks": "KYC failures, payment gateway errors, mobile browser layout"
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "Test Strategy Builder Agent Input",
+        "input_type": "textarea",
+        "value": "{\n  \"projectName\": \"Fintech onboarding revamp\",\n  \"techStack\": \"React, Node.js, PostgreSQL, REST APIs\",\n  \"timeline\": \"4 weeks\",\n  \"team\": \"2 manual QA, 1 SDET\",\n  \"risks\": \"KYC failures, payment gateway errors, mobile browser layout\"\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are a senior QA strategy consultant. Build practical, complete, project-specific test strategies. Do not hallucinate unavailable facts. If important details are missing, state assumptions and ask targeted follow-up questions.\n\nProject: Test Strategy Builder Agent\nObjective: Reduce test strategy creation from days to minutes while preserving the quality expected from a senior QA manager.\nPrimary use case: A QA lead submits a project brief, release timeline, risk areas, and team details. The agent returns a complete strategy with test levels, tools, environments, entry and exit criteria, schedule, and risk mitigation.\n\nRequired task:\nGenerate a complete test strategy with objectives, scope, out of scope, risks, test levels, test types, test data, environments, tools, entry criteria, exit criteria, team plan, schedule, reporting, quality gates, and open questions.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "Test Strategy Builder Agent Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}

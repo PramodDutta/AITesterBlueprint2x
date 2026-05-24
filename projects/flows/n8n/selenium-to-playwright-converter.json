@@ -1,0 +1,163 @@
+{
+  "name": "AIQA AGENT - Selenium to Playwright Converter",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aiqa/selenium-to-playwright-converter",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "6188d297-a75e-34ed-04b6-6fb6766eed52",
+      "name": "Project Intake Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        0
+      ],
+      "webhookId": "3fcadfcf-68d9-4cbd-604f-9225b8d18a19"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\nreturn [{\n  json: {\n    projectId: \"selenium-to-playwright-converter\",\n    title: \"Selenium to Playwright Converter\",\n    provider: body.provider ?? process.env.AIQA_PROVIDER ?? \"groq\",\n    model: body.model ?? process.env.AIQA_MODEL ?? \"\",\n    input: body.input ?? body,\n    wrapperUrl: body.wrapperUrl ?? process.env.AIQA_WRAPPER_URL ?? \"http://host.docker.internal:8787/api/run\"\n  }\n}];"
+      },
+      "id": "48bfc169-7571-e289-8010-1d6c4b6de66d",
+      "name": "Normalize AIQA Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.wrapperUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ projectId: $json.projectId, provider: $json.provider, model: $json.model, input: $json.input }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "2b008965-0590-68c5-ad25-6a5614d3a474",
+      "name": "Call Multi Provider AI Wrapper",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $json;\nreturn [{\n  json: {\n    projectId: \"selenium-to-playwright-converter\",\n    title: \"Selenium to Playwright Converter\",\n    provider: response.provider ?? \"ai-wrapper\",\n    model: response.model ?? \"\",\n    output: response.output ?? response.content ?? response.message ?? response,\n    usage: response.usage ?? null,\n    generatedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "c5849791-f21d-e8db-729c-388e9e79b167",
+      "name": "Shape QA Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "527843ce-794e-968d-9a5c-4b5bfe7c7bc0",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Project Intake Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize AIQA Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize AIQA Request": {
+      "main": [
+        [
+          {
+            "node": "Call Multi Provider AI Wrapper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Multi Provider AI Wrapper": {
+      "main": [
+        [
+          {
+            "node": "Shape QA Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape QA Output": {
+      "main": [
+        [
+          {
+            "node": "Return Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "AI Tester Blueprint 2x"
+    },
+    {
+      "name": "agent"
+    }
+  ],
+  "meta": {
+    "projectId": "selenium-to-playwright-converter",
+    "wrapperRequired": true,
+    "wrapperUrlEnv": "AIQA_WRAPPER_URL",
+    "samplePayload": {
+      "provider": "groq",
+      "input": {
+        "language": "Java to TypeScript",
+        "code": "driver.findElement(By.id(\"username\")).sendKeys(\"admin\"); driver.findElement(By.cssSelector(\"button[type=submit]\")).click();"
+      }
+    }
+  }
+}

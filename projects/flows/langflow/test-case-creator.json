@@ -1,0 +1,89 @@
+{
+  "name": "AIQA AGENT - Test Case Creator Agent",
+  "description": "Transforms Jira or Azure DevOps user stories into reusable manual and automated test cases. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "test-case-creator",
+    "kind": "agent",
+    "category": "Test Design",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "story": "As a shopper I can apply a coupon during checkout so that my order total is discounted.",
+      "acceptanceCriteria": "Valid coupons discount cart total. Expired coupons show an error. One coupon can be applied per order."
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "Test Case Creator Agent Input",
+        "input_type": "textarea",
+        "value": "{\n  \"story\": \"As a shopper I can apply a coupon during checkout so that my order total is discounted.\",\n  \"acceptanceCriteria\": \"Valid coupons discount cart total. Expired coupons show an error. One coupon can be applied per order.\"\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are a senior test design engineer. Produce precise, executable test cases from requirements. Keep each case traceable to a requirement or assumption.\n\nProject: Test Case Creator Agent\nObjective: Turn requirement text into high-coverage positive, negative, edge, and regression cases with consistent formatting.\nPrimary use case: A tester pastes a user story or Jira payload and receives prioritized test cases ready for TestRail, Zephyr, Gherkin, or JSON export.\n\nRequired task:\nCreate test cases from the supplied story. Include preconditions, steps, expected results, test data, priority, type, automation candidate flag, and traceability references. Also list missing acceptance criteria.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "Test Case Creator Agent Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}

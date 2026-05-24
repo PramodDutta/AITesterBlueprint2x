@@ -1,0 +1,89 @@
+{
+  "name": "AIQA AGENT - Selenium to Playwright Converter",
+  "description": "Converts Selenium Java, Python, or JavaScript tests into modern Playwright scripts. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "selenium-to-playwright-converter",
+    "kind": "agent",
+    "category": "Automation",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "language": "Java to TypeScript",
+      "code": "driver.findElement(By.id(\"username\")).sendKeys(\"admin\"); driver.findElement(By.cssSelector(\"button[type=submit]\")).click();"
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "Selenium to Playwright Converter Input",
+        "input_type": "textarea",
+        "value": "{\n  \"language\": \"Java to TypeScript\",\n  \"code\": \"driver.findElement(By.id(\\\"username\\\")).sendKeys(\\\"admin\\\"); driver.findElement(By.cssSelector(\\\"button[type=submit]\\\")).click();\"\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are a migration specialist for Selenium and Playwright automation frameworks. Preserve behavior while modernizing code.\n\nProject: Selenium to Playwright Converter\nObjective: Accelerate migration from legacy Selenium suites to cleaner Playwright projects with stable locators and assertions.\nPrimary use case: An SDET pastes Selenium code and receives equivalent Playwright code with locator improvements, wait simplification, and migration notes.\n\nRequired task:\nConvert the Selenium test to Playwright. Include the converted code, locator mapping table, changed waits, unsupported behavior warnings, and setup notes.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "Selenium to Playwright Converter Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}

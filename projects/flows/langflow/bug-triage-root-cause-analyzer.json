@@ -1,0 +1,89 @@
+{
+  "name": "AIQA TOOL - AI Bug Triage and Root Cause Analyzer",
+  "description": "Analyzes failed tests, logs, screenshots, and network notes to classify likely root cause and owner. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "bug-triage-root-cause-analyzer",
+    "kind": "tool",
+    "category": "Testing Tool",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "logs": "Expected status 200 but received 500 on POST /checkout. Stack trace shows PaymentGatewayTimeout.",
+      "recentChanges": "Payment retry logic merged yesterday"
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "AI Bug Triage and Root Cause Analyzer Input",
+        "input_type": "textarea",
+        "value": "{\n  \"logs\": \"Expected status 200 but received 500 on POST /checkout. Stack trace shows PaymentGatewayTimeout.\",\n  \"recentChanges\": \"Payment retry logic merged yesterday\"\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are a bug triage specialist. Use the provided evidence to classify probable root cause and next steps. Distinguish product defects from test issues.\n\nProject: AI Bug Triage and Root Cause Analyzer\nObjective: Cut triage time by clustering failures and creating actionable bug investigation summaries.\nPrimary use case: A CI pipeline sends failure logs. The tool returns likely root cause, owner, severity, duplicate hints, and next debug steps.\n\nRequired task:\nAnalyze the failure context. Provide root cause category, evidence, owner suggestion, severity, confidence, immediate debug steps, and a concise Jira bug draft.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "AI Bug Triage and Root Cause Analyzer Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}

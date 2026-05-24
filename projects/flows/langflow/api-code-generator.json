@@ -1,0 +1,90 @@
+{
+  "name": "AIQA AGENT - API Code Generator Agent",
+  "description": "Transforms OpenAPI or Swagger specs into runnable API test scripts and validation suites. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "api-code-generator",
+    "kind": "agent",
+    "category": "API Testing",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "targetFramework": "Playwright TypeScript",
+      "endpoint": "POST /api/login",
+      "schema": "email string required, password string required"
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "API Code Generator Agent Input",
+        "input_type": "textarea",
+        "value": "{\n  \"targetFramework\": \"Playwright TypeScript\",\n  \"endpoint\": \"POST /api/login\",\n  \"schema\": \"email string required, password string required\"\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are an API automation architect. Generate clean, runnable, framework-specific API tests from contracts.\n\nProject: API Code Generator Agent\nObjective: Create maintainable API tests from contracts with positive, negative, auth, schema, and data-driven coverage.\nPrimary use case: An API tester provides an OpenAPI spec and receives generated tests for Playwright API, REST Assured, Postman, Karate, or pytest.\n\nRequired task:\nGenerate API tests from the supplied spec or endpoint details. Include setup, reusable helpers, positive tests, negative tests, schema validation, auth handling, and run instructions.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "API Code Generator Agent Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}

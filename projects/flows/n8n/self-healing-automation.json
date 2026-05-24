@@ -1,0 +1,164 @@
+{
+  "name": "AIQA AGENT - Self-Healing Automation Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aiqa/self-healing-automation",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "75fbe4a0-1eb0-5c7e-e4d0-9edd8fb077f0",
+      "name": "Project Intake Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        0
+      ],
+      "webhookId": "77378a13-1545-9d03-cf15-172c115b7bd4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\nreturn [{\n  json: {\n    projectId: \"self-healing-automation\",\n    title: \"Self-Healing Automation Agent\",\n    provider: body.provider ?? process.env.AIQA_PROVIDER ?? \"groq\",\n    model: body.model ?? process.env.AIQA_MODEL ?? \"\",\n    input: body.input ?? body,\n    wrapperUrl: body.wrapperUrl ?? process.env.AIQA_WRAPPER_URL ?? \"http://host.docker.internal:8787/api/run\"\n  }\n}];"
+      },
+      "id": "9d9de146-61e5-f36e-e1f0-cc7579b31eb6",
+      "name": "Normalize AIQA Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.wrapperUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ projectId: $json.projectId, provider: $json.provider, model: $json.model, input: $json.input }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "e2a437e1-8b78-1349-9f84-00936a78c484",
+      "name": "Call Multi Provider AI Wrapper",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $json;\nreturn [{\n  json: {\n    projectId: \"self-healing-automation\",\n    title: \"Self-Healing Automation Agent\",\n    provider: response.provider ?? \"ai-wrapper\",\n    model: response.model ?? \"\",\n    output: response.output ?? response.content ?? response.message ?? response,\n    usage: response.usage ?? null,\n    generatedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "a8f494cc-30f5-8e1b-97fc-5d935fa07134",
+      "name": "Shape QA Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "95a70b98-ea3d-0fa7-01fe-5f78cef596dd",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Project Intake Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize AIQA Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize AIQA Request": {
+      "main": [
+        [
+          {
+            "node": "Call Multi Provider AI Wrapper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Multi Provider AI Wrapper": {
+      "main": [
+        [
+          {
+            "node": "Shape QA Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape QA Output": {
+      "main": [
+        [
+          {
+            "node": "Return Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "AI Tester Blueprint 2x"
+    },
+    {
+      "name": "agent"
+    }
+  ],
+  "meta": {
+    "projectId": "self-healing-automation",
+    "wrapperRequired": true,
+    "wrapperUrlEnv": "AIQA_WRAPPER_URL",
+    "samplePayload": {
+      "provider": "groq",
+      "input": {
+        "brokenSelector": "#login > div:nth-child(2) > button",
+        "intent": "click the sign in button",
+        "currentDom": "<button data-testid=\"login-submit\" aria-label=\"Sign in\">Sign in</button>"
+      }
+    }
+  }
+}

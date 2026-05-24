@@ -1,0 +1,90 @@
+{
+  "name": "AIQA AGENT - Self-Healing Automation Agent",
+  "description": "Detects broken locators and recommends resilient replacements using DOM context and intent. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "self-healing-automation",
+    "kind": "agent",
+    "category": "Automation",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "brokenSelector": "#login > div:nth-child(2) > button",
+      "intent": "click the sign in button",
+      "currentDom": "<button data-testid=\"login-submit\" aria-label=\"Sign in\">Sign in</button>"
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "Self-Healing Automation Agent Input",
+        "input_type": "textarea",
+        "value": "{\n  \"brokenSelector\": \"#login > div:nth-child(2) > button\",\n  \"intent\": \"click the sign in button\",\n  \"currentDom\": \"<button data-testid=\\\"login-submit\\\" aria-label=\\\"Sign in\\\">Sign in</button>\"\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are a DOM and locator resilience expert. Prefer accessible locators, data-testid, stable attributes, and user-facing text over brittle paths.\n\nProject: Self-Healing Automation Agent\nObjective: Reduce UI automation maintenance by healing selectors and explaining why the original locator failed.\nPrimary use case: A CI failure includes a broken selector and current DOM. The agent finds the intended element and proposes ranked replacements.\n\nRequired task:\nHeal the broken locator. Explain why it failed, identify the intended element, provide 3 ranked replacement selectors for Playwright, Selenium, and Cypress where possible, then show a code patch.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "Self-Healing Automation Agent Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "name": "AIQA TOOL - AI Test Case Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aiqa/ai-test-case-generator",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c9397780-7e52-0c43-2397-4400e7dbcc1b",
+      "name": "Project Intake Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        0
+      ],
+      "webhookId": "3176fc5c-b83a-5943-40ed-4bd853ccecce"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\nreturn [{\n  json: {\n    projectId: \"ai-test-case-generator\",\n    title: \"AI Test Case Generator\",\n    provider: body.provider ?? process.env.AIQA_PROVIDER ?? \"groq\",\n    model: body.model ?? process.env.AIQA_MODEL ?? \"\",\n    input: body.input ?? body,\n    wrapperUrl: body.wrapperUrl ?? process.env.AIQA_WRAPPER_URL ?? \"http://host.docker.internal:8787/api/run\"\n  }\n}];"
+      },
+      "id": "2d3045c2-23c4-36c7-564e-91bfb2152c96",
+      "name": "Normalize AIQA Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.wrapperUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ projectId: $json.projectId, provider: $json.provider, model: $json.model, input: $json.input }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "43a88093-27ef-554a-8886-e85e8c378a2f",
+      "name": "Call Multi Provider AI Wrapper",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $json;\nreturn [{\n  json: {\n    projectId: \"ai-test-case-generator\",\n    title: \"AI Test Case Generator\",\n    provider: response.provider ?? \"ai-wrapper\",\n    model: response.model ?? \"\",\n    output: response.output ?? response.content ?? response.message ?? response,\n    usage: response.usage ?? null,\n    generatedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "dd3e64d0-0e39-c9b5-e93f-fd9df1430f07",
+      "name": "Shape QA Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "3e30b908-6245-7f53-818d-404594f2bea9",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Project Intake Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize AIQA Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize AIQA Request": {
+      "main": [
+        [
+          {
+            "node": "Call Multi Provider AI Wrapper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Multi Provider AI Wrapper": {
+      "main": [
+        [
+          {
+            "node": "Shape QA Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape QA Output": {
+      "main": [
+        [
+          {
+            "node": "Return Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "AI Tester Blueprint 2x"
+    },
+    {
+      "name": "tool"
+    }
+  ],
+  "meta": {
+    "projectId": "ai-test-case-generator",
+    "wrapperRequired": true,
+    "wrapperUrlEnv": "AIQA_WRAPPER_URL",
+    "samplePayload": {
+      "provider": "groq",
+      "input": {
+        "prd": "Users can reset password using email OTP. OTP expires after 10 minutes.",
+        "format": "Gherkin and JSON"
+      }
+    }
+  }
+}

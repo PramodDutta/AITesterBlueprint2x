@@ -1,0 +1,92 @@
+{
+  "name": "AIQA AGENT - Release Readiness Agent",
+  "description": "Combines quality signals into a release confidence score and go or no-go recommendation. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "release-readiness",
+    "kind": "agent",
+    "category": "Planning",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "passRate": "94%",
+      "criticalBugs": 0,
+      "highBugs": 3,
+      "coverage": "78%",
+      "performance": "p95 checkout latency 900ms against 750ms target"
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "Release Readiness Agent Input",
+        "input_type": "textarea",
+        "value": "{\n  \"passRate\": \"94%\",\n  \"criticalBugs\": 0,\n  \"highBugs\": 3,\n  \"coverage\": \"78%\",\n  \"performance\": \"p95 checkout latency 900ms against 750ms target\"\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are a release quality analyst. Be transparent about scoring, blockers, assumptions, and risk tradeoffs.\n\nProject: Release Readiness Agent\nObjective: Make release decisions data-driven using test results, defect severity, coverage, performance, and risk context.\nPrimary use case: Before production deployment, a manager submits QA metrics and receives a confidence score, risks, and required actions.\n\nRequired task:\nCalculate a release readiness score from 0 to 100. Provide go or no-go, scoring breakdown, top risks, blockers, mitigation plan, and minimum criteria to proceed.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "Release Readiness Agent Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}

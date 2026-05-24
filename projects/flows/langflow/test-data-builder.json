@@ -1,0 +1,90 @@
+{
+  "name": "AIQA AGENT - Test Data Builder Agent",
+  "description": "Generates schema-compliant realistic and edge-case test data for APIs, UI forms, and databases. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "test-data-builder",
+    "kind": "agent",
+    "category": "Test Design",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "schema": "user(id uuid, email unique, age 18-99, country IN, US, UK, plan free|pro)",
+      "format": "JSON",
+      "volume": 20
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "Test Data Builder Agent Input",
+        "input_type": "textarea",
+        "value": "{\n  \"schema\": \"user(id uuid, email unique, age 18-99, country IN, US, UK, plan free|pro)\",\n  \"format\": \"JSON\",\n  \"volume\": 20\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are a test data engineering expert. Generate realistic but safe test data that respects schema, privacy, and validation rules.\n\nProject: Test Data Builder Agent\nObjective: Remove test data bottlenecks by producing valid, invalid, boundary, masked, and security-focused datasets on demand.\nPrimary use case: A QA submits a schema or form definition and receives JSON, CSV, SQL inserts, or API payloads for test execution.\n\nRequired task:\nGenerate test data for the supplied schema. Include valid rows, negative rows, boundary rows, and security payloads. Explain any assumptions and output in the requested format.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "Test Data Builder Agent Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+[
+  {
+    "id": "test-strategy-builder",
+    "title": "Test Strategy Builder Agent",
+    "kind": "agent",
+    "n8n": "flows/n8n/test-strategy-builder.json",
+    "langflow": "flows/langflow/test-strategy-builder.json"
+  },
+  {
+    "id": "test-case-creator",
+    "title": "Test Case Creator Agent",
+    "kind": "agent",
+    "n8n": "flows/n8n/test-case-creator.json",
+    "langflow": "flows/langflow/test-case-creator.json"
+  },
+  {
+    "id": "test-data-builder",
+    "title": "Test Data Builder Agent",
+    "kind": "agent",
+    "n8n": "flows/n8n/test-data-builder.json",
+    "langflow": "flows/langflow/test-data-builder.json"
+  },
+  {
+    "id": "selenium-to-playwright-converter",
+    "title": "Selenium to Playwright Converter",
+    "kind": "agent",
+    "n8n": "flows/n8n/selenium-to-playwright-converter.json",
+    "langflow": "flows/langflow/selenium-to-playwright-converter.json"
+  },
+  {
+    "id": "api-code-generator",
+    "title": "API Code Generator Agent",
+    "kind": "agent",
+    "n8n": "flows/n8n/api-code-generator.json",
+    "langflow": "flows/langflow/api-code-generator.json"
+  },
+  {
+    "id": "accessibility-auditor",
+    "title": "Accessibility Auditor Agent",
+    "kind": "agent",
+    "n8n": "flows/n8n/accessibility-auditor.json",
+    "langflow": "flows/langflow/accessibility-auditor.json"
+  },
+  {
+    "id": "chrome-recorder",
+    "title": "Chrome Recorder Agent",
+    "kind": "agent",
+    "n8n": "flows/n8n/chrome-recorder.json",
+    "langflow": "flows/langflow/chrome-recorder.json"
+  },
+  {
+    "id": "self-healing-automation",
+    "title": "Self-Healing Automation Agent",
+    "kind": "agent",
+    "n8n": "flows/n8n/self-healing-automation.json",
+    "langflow": "flows/langflow/self-healing-automation.json"
+  },
+  {
+    "id": "flaky-test-detector",
+    "title": "Flaky Test Detector Agent",
+    "kind": "agent",
+    "n8n": "flows/n8n/flaky-test-detector.json",
+    "langflow": "flows/langflow/flaky-test-detector.json"
+  },
+  {
+    "id": "release-readiness",
+    "title": "Release Readiness Agent",
+    "kind": "agent",
+    "n8n": "flows/n8n/release-readiness.json",
+    "langflow": "flows/langflow/release-readiness.json"
+  },
+  {
+    "id": "ai-test-case-generator",
+    "title": "AI Test Case Generator",
+    "kind": "tool",
+    "n8n": "flows/n8n/ai-test-case-generator.json",
+    "langflow": "flows/langflow/ai-test-case-generator.json"
+  },
+  {
+    "id": "dom-screenshot-ui-test-generator",
+    "title": "DOM and Screenshot UI Test Generator",
+    "kind": "tool",
+    "n8n": "flows/n8n/dom-screenshot-ui-test-generator.json",
+    "langflow": "flows/langflow/dom-screenshot-ui-test-generator.json"
+  },
+  {
+    "id": "bug-triage-root-cause-analyzer",
+    "title": "AI Bug Triage and Root Cause Analyzer",
+    "kind": "tool",
+    "n8n": "flows/n8n/bug-triage-root-cause-analyzer.json",
+    "langflow": "flows/langflow/bug-triage-root-cause-analyzer.json"
+  }
+]

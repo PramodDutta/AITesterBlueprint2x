@@ -1,0 +1,594 @@
+{
+  "version": "1.0.0",
+  "generatedFor": "AI Tester Blueprint 2x projects branch",
+  "description": "Portfolio catalog for 10 AI testing agents and 3 AI testing tools derived from the AI Tester dashboard reference.",
+  "providerSupport": [
+    "groq",
+    "openai",
+    "chatgpt",
+    "anthropic",
+    "openrouter",
+    "ollama",
+    "lmstudio"
+  ],
+  "projects": [
+    {
+      "id": "test-strategy-builder",
+      "kind": "agent",
+      "title": "Test Strategy Builder Agent",
+      "category": "Planning",
+      "status": "ready",
+      "summary": "Creates customized test strategies aligned with scope, tech stack, release goals, risks, and team capacity.",
+      "objective": "Reduce test strategy creation from days to minutes while preserving the quality expected from a senior QA manager.",
+      "primaryUseCase": "A QA lead submits a project brief, release timeline, risk areas, and team details. The agent returns a complete strategy with test levels, tools, environments, entry and exit criteria, schedule, and risk mitigation.",
+      "inputs": [
+        "project brief",
+        "tech stack",
+        "team size and skills",
+        "release date",
+        "risk areas",
+        "compliance constraints"
+      ],
+      "outputs": [
+        "strategy document",
+        "risk matrix",
+        "test level plan",
+        "tool recommendations",
+        "entry and exit criteria",
+        "execution timeline"
+      ],
+      "integrations": [
+        "Jira",
+        "Confluence",
+        "Notion",
+        "Google Docs"
+      ],
+      "workflow": [
+        "Normalize project metadata and missing context.",
+        "Classify application type, release pressure, and risk level.",
+        "Generate strategy sections with ISTQB-aligned structure.",
+        "Recommend tools and environments based on stack.",
+        "Return Markdown, JSON summary, and follow-up questions."
+      ],
+      "systemPrompt": "You are a senior QA strategy consultant. Build practical, complete, project-specific test strategies. Do not hallucinate unavailable facts. If important details are missing, state assumptions and ask targeted follow-up questions.",
+      "taskPrompt": "Generate a complete test strategy with objectives, scope, out of scope, risks, test levels, test types, test data, environments, tools, entry criteria, exit criteria, team plan, schedule, reporting, quality gates, and open questions.",
+      "sampleInput": {
+        "projectName": "Fintech onboarding revamp",
+        "techStack": "React, Node.js, PostgreSQL, REST APIs",
+        "timeline": "4 weeks",
+        "team": "2 manual QA, 1 SDET",
+        "risks": "KYC failures, payment gateway errors, mobile browser layout"
+      }
+    },
+    {
+      "id": "test-case-creator",
+      "kind": "agent",
+      "title": "Test Case Creator Agent",
+      "category": "Test Design",
+      "status": "ready",
+      "summary": "Transforms Jira or Azure DevOps user stories into reusable manual and automated test cases.",
+      "objective": "Turn requirement text into high-coverage positive, negative, edge, and regression cases with consistent formatting.",
+      "primaryUseCase": "A tester pastes a user story or Jira payload and receives prioritized test cases ready for TestRail, Zephyr, Gherkin, or JSON export.",
+      "inputs": [
+        "user story",
+        "acceptance criteria",
+        "business rules",
+        "UI notes",
+        "API notes",
+        "priority"
+      ],
+      "outputs": [
+        "manual test cases",
+        "Gherkin scenarios",
+        "test data",
+        "priority labels",
+        "automation hints",
+        "missing requirement questions"
+      ],
+      "integrations": [
+        "Jira",
+        "Azure DevOps",
+        "TestRail",
+        "Zephyr"
+      ],
+      "workflow": [
+        "Extract user intent, actors, preconditions, and validations.",
+        "Create happy path and alternate path cases.",
+        "Add negative, boundary, data-driven, accessibility, and security checks.",
+        "Prioritize P0 to P3 and map each case to acceptance criteria.",
+        "Return structured test assets plus gaps."
+      ],
+      "systemPrompt": "You are a senior test design engineer. Produce precise, executable test cases from requirements. Keep each case traceable to a requirement or assumption.",
+      "taskPrompt": "Create test cases from the supplied story. Include preconditions, steps, expected results, test data, priority, type, automation candidate flag, and traceability references. Also list missing acceptance criteria.",
+      "sampleInput": {
+        "story": "As a shopper I can apply a coupon during checkout so that my order total is discounted.",
+        "acceptanceCriteria": "Valid coupons discount cart total. Expired coupons show an error. One coupon can be applied per order."
+      }
+    },
+    {
+      "id": "test-data-builder",
+      "kind": "agent",
+      "title": "Test Data Builder Agent",
+      "category": "Test Design",
+      "status": "ready",
+      "summary": "Generates schema-compliant realistic and edge-case test data for APIs, UI forms, and databases.",
+      "objective": "Remove test data bottlenecks by producing valid, invalid, boundary, masked, and security-focused datasets on demand.",
+      "primaryUseCase": "A QA submits a schema or form definition and receives JSON, CSV, SQL inserts, or API payloads for test execution.",
+      "inputs": [
+        "schema",
+        "field rules",
+        "locale",
+        "volume",
+        "privacy constraints",
+        "edge cases"
+      ],
+      "outputs": [
+        "JSON records",
+        "CSV rows",
+        "SQL inserts",
+        "invalid data sets",
+        "boundary data sets",
+        "masking notes"
+      ],
+      "integrations": [
+        "PostgreSQL",
+        "MySQL",
+        "MongoDB",
+        "REST APIs"
+      ],
+      "workflow": [
+        "Parse schema and validation rules.",
+        "Generate valid production-like data.",
+        "Generate invalid, boundary, null, overflow, unicode, and attack payloads.",
+        "Validate relationships and foreign key assumptions.",
+        "Return selected export format with data quality notes."
+      ],
+      "systemPrompt": "You are a test data engineering expert. Generate realistic but safe test data that respects schema, privacy, and validation rules.",
+      "taskPrompt": "Generate test data for the supplied schema. Include valid rows, negative rows, boundary rows, and security payloads. Explain any assumptions and output in the requested format.",
+      "sampleInput": {
+        "schema": "user(id uuid, email unique, age 18-99, country IN, US, UK, plan free|pro)",
+        "format": "JSON",
+        "volume": 20
+      }
+    },
+    {
+      "id": "selenium-to-playwright-converter",
+      "kind": "agent",
+      "title": "Selenium to Playwright Converter",
+      "category": "Automation",
+      "status": "ready",
+      "summary": "Converts Selenium Java, Python, or JavaScript tests into modern Playwright scripts.",
+      "objective": "Accelerate migration from legacy Selenium suites to cleaner Playwright projects with stable locators and assertions.",
+      "primaryUseCase": "An SDET pastes Selenium code and receives equivalent Playwright code with locator improvements, wait simplification, and migration notes.",
+      "inputs": [
+        "Selenium code",
+        "language target",
+        "framework conventions",
+        "locator preferences",
+        "assertion library"
+      ],
+      "outputs": [
+        "Playwright code",
+        "migration notes",
+        "locator mapping",
+        "wait conversion",
+        "risk warnings"
+      ],
+      "integrations": [
+        "Selenium",
+        "Playwright",
+        "GitHub",
+        "CI"
+      ],
+      "workflow": [
+        "Detect Selenium language and framework style.",
+        "Map WebDriver actions to Playwright APIs.",
+        "Modernize waits, selectors, and assertions.",
+        "Preserve test intent and page object boundaries.",
+        "Return converted code plus manual review checklist."
+      ],
+      "systemPrompt": "You are a migration specialist for Selenium and Playwright automation frameworks. Preserve behavior while modernizing code.",
+      "taskPrompt": "Convert the Selenium test to Playwright. Include the converted code, locator mapping table, changed waits, unsupported behavior warnings, and setup notes.",
+      "sampleInput": {
+        "language": "Java to TypeScript",
+        "code": "driver.findElement(By.id(\"username\")).sendKeys(\"admin\"); driver.findElement(By.cssSelector(\"button[type=submit]\")).click();"
+      }
+    },
+    {
+      "id": "api-code-generator",
+      "kind": "agent",
+      "title": "API Code Generator Agent",
+      "category": "API Testing",
+      "status": "ready",
+      "summary": "Transforms OpenAPI or Swagger specs into runnable API test scripts and validation suites.",
+      "objective": "Create maintainable API tests from contracts with positive, negative, auth, schema, and data-driven coverage.",
+      "primaryUseCase": "An API tester provides an OpenAPI spec and receives generated tests for Playwright API, REST Assured, Postman, Karate, or pytest.",
+      "inputs": [
+        "OpenAPI spec",
+        "base URL",
+        "auth details",
+        "target framework",
+        "critical endpoints"
+      ],
+      "outputs": [
+        "API test code",
+        "schema assertions",
+        "negative tests",
+        "auth tests",
+        "environment config",
+        "coverage summary"
+      ],
+      "integrations": [
+        "Swagger",
+        "OpenAPI",
+        "REST Assured",
+        "Postman",
+        "Playwright"
+      ],
+      "workflow": [
+        "Parse endpoint paths, methods, schemas, and auth.",
+        "Generate smoke and contract tests.",
+        "Add negative and boundary payload tests.",
+        "Create environment variables and reusable helpers.",
+        "Return runnable code and coverage notes."
+      ],
+      "systemPrompt": "You are an API automation architect. Generate clean, runnable, framework-specific API tests from contracts.",
+      "taskPrompt": "Generate API tests from the supplied spec or endpoint details. Include setup, reusable helpers, positive tests, negative tests, schema validation, auth handling, and run instructions.",
+      "sampleInput": {
+        "targetFramework": "Playwright TypeScript",
+        "endpoint": "POST /api/login",
+        "schema": "email string required, password string required"
+      }
+    },
+    {
+      "id": "accessibility-auditor",
+      "kind": "agent",
+      "title": "Accessibility Auditor Agent",
+      "category": "Accessibility",
+      "status": "ready",
+      "summary": "Audits UI code or page descriptions against WCAG, ARIA, keyboard, and screen reader expectations.",
+      "objective": "Help QA and developers detect accessibility defects early and produce actionable fixes.",
+      "primaryUseCase": "A tester provides HTML, DOM snippets, or screenshots notes and receives an accessibility report with severity and code fixes.",
+      "inputs": [
+        "HTML",
+        "DOM snapshot",
+        "component description",
+        "screenshot notes",
+        "target WCAG level"
+      ],
+      "outputs": [
+        "WCAG issues",
+        "severity ratings",
+        "fix snippets",
+        "keyboard checklist",
+        "screen reader notes"
+      ],
+      "integrations": [
+        "Axe",
+        "Pa11y",
+        "WAVE",
+        "Lighthouse"
+      ],
+      "workflow": [
+        "Inspect labels, roles, names, and relationships.",
+        "Check keyboard and focus risks.",
+        "Identify contrast and semantics concerns from provided context.",
+        "Recommend code-level fixes.",
+        "Return audit report with verification steps."
+      ],
+      "systemPrompt": "You are a WCAG 2.2 AA accessibility expert. Provide specific issues, impact, and fixes without overstating what cannot be verified from the input.",
+      "taskPrompt": "Audit the supplied UI context. Report accessibility defects with WCAG references, severity, affected users, fix recommendation, code snippet when possible, and retest steps.",
+      "sampleInput": {
+        "html": "<button><span></span></button><input placeholder=\"Email\">",
+        "target": "WCAG 2.2 AA"
+      }
+    },
+    {
+      "id": "chrome-recorder",
+      "kind": "agent",
+      "title": "Chrome Recorder Agent",
+      "category": "Automation",
+      "status": "ready",
+      "summary": "Converts recorded browser interactions into readable Playwright or Puppeteer scripts.",
+      "objective": "Turn exploratory or manual browser flows into maintainable automated tests with assertions and robust selectors.",
+      "primaryUseCase": "A tester records steps or shares an event log. The agent generates an automation script, checkpoints, assertions, and cleanup notes.",
+      "inputs": [
+        "recorded steps",
+        "DOM snapshot",
+        "target framework",
+        "assertion goals",
+        "test data"
+      ],
+      "outputs": [
+        "automation script",
+        "selector strategy",
+        "assertions",
+        "test data setup",
+        "maintenance notes"
+      ],
+      "integrations": [
+        "Chrome DevTools",
+        "Playwright",
+        "Puppeteer",
+        "GitHub"
+      ],
+      "workflow": [
+        "Clean raw recorded actions.",
+        "Replace brittle selectors with role or test-id selectors.",
+        "Add waits only where needed.",
+        "Insert meaningful assertions.",
+        "Return a runnable test with comments for manual review points."
+      ],
+      "systemPrompt": "You are an automation engineer who turns recorded browser flows into clean Playwright and Puppeteer tests.",
+      "taskPrompt": "Convert the browser recording into an automation test. Add robust selectors, meaningful assertions, setup data, teardown notes, and fragility warnings.",
+      "sampleInput": {
+        "targetFramework": "Playwright TypeScript",
+        "steps": "open login page, fill email, fill password, click sign in, verify dashboard"
+      }
+    },
+    {
+      "id": "self-healing-automation",
+      "kind": "agent",
+      "title": "Self-Healing Automation Agent",
+      "category": "Automation",
+      "status": "ready",
+      "summary": "Detects broken locators and recommends resilient replacements using DOM context and intent.",
+      "objective": "Reduce UI automation maintenance by healing selectors and explaining why the original locator failed.",
+      "primaryUseCase": "A CI failure includes a broken selector and current DOM. The agent finds the intended element and proposes ranked replacements.",
+      "inputs": [
+        "broken selector",
+        "current DOM",
+        "old DOM optional",
+        "test intent",
+        "screenshot notes"
+      ],
+      "outputs": [
+        "healed selectors",
+        "confidence score",
+        "root cause",
+        "patch suggestion",
+        "rerun checklist"
+      ],
+      "integrations": [
+        "Selenium",
+        "Playwright",
+        "Cypress",
+        "CI"
+      ],
+      "workflow": [
+        "Infer target element intent.",
+        "Compare selector attributes against current DOM.",
+        "Rank alternative selectors by resilience.",
+        "Suggest code patch and assertion improvement.",
+        "Return confidence and verification steps."
+      ],
+      "systemPrompt": "You are a DOM and locator resilience expert. Prefer accessible locators, data-testid, stable attributes, and user-facing text over brittle paths.",
+      "taskPrompt": "Heal the broken locator. Explain why it failed, identify the intended element, provide 3 ranked replacement selectors for Playwright, Selenium, and Cypress where possible, then show a code patch.",
+      "sampleInput": {
+        "brokenSelector": "#login > div:nth-child(2) > button",
+        "intent": "click the sign in button",
+        "currentDom": "<button data-testid=\"login-submit\" aria-label=\"Sign in\">Sign in</button>"
+      }
+    },
+    {
+      "id": "flaky-test-detector",
+      "kind": "agent",
+      "title": "Flaky Test Detector Agent",
+      "category": "Debugging",
+      "status": "ready",
+      "summary": "Analyzes test history and failure context to identify unstable tests and recommend fixes.",
+      "objective": "Stabilize CI by separating real product defects from timing, data, environment, and dependency flakes.",
+      "primaryUseCase": "A QA lead provides recent CI history. The agent ranks flaky tests, clusters failure patterns, and recommends fixes.",
+      "inputs": [
+        "test history",
+        "failure logs",
+        "retry results",
+        "environment data",
+        "test metadata"
+      ],
+      "outputs": [
+        "flaky test ranking",
+        "root cause cluster",
+        "fix recommendation",
+        "retry policy",
+        "owner suggestion"
+      ],
+      "integrations": [
+        "GitHub Actions",
+        "Jenkins",
+        "GitLab CI",
+        "Allure"
+      ],
+      "workflow": [
+        "Calculate pass rate and retry behavior.",
+        "Cluster failures by message, environment, and timing.",
+        "Classify likely flake causes.",
+        "Recommend deterministic fixes before retries.",
+        "Return prioritized stabilization plan."
+      ],
+      "systemPrompt": "You are a CI test stability specialist. Diagnose flaky tests using evidence, not guesses. Prefer deterministic fixes over blanket retries.",
+      "taskPrompt": "Analyze the test history and failure logs. Identify flaky tests, classify root causes, rank by pipeline impact, recommend fixes, and provide a retry policy only where justified.",
+      "sampleInput": {
+        "history": "checkout.spec.ts passed 12/20, failed mostly on WebKit after 30s timeout; login.spec.ts passed 19/20",
+        "logs": "Timeout waiting for networkidle"
+      }
+    },
+    {
+      "id": "release-readiness",
+      "kind": "agent",
+      "title": "Release Readiness Agent",
+      "category": "Planning",
+      "status": "ready",
+      "summary": "Combines quality signals into a release confidence score and go or no-go recommendation.",
+      "objective": "Make release decisions data-driven using test results, defect severity, coverage, performance, and risk context.",
+      "primaryUseCase": "Before production deployment, a manager submits QA metrics and receives a confidence score, risks, and required actions.",
+      "inputs": [
+        "test pass rate",
+        "open bugs",
+        "coverage",
+        "performance results",
+        "risk areas",
+        "rollback readiness"
+      ],
+      "outputs": [
+        "readiness score",
+        "go or no-go decision",
+        "risk summary",
+        "blockers",
+        "next actions"
+      ],
+      "integrations": [
+        "Jenkins",
+        "GitHub Actions",
+        "Jira",
+        "SonarQube"
+      ],
+      "workflow": [
+        "Normalize release metrics.",
+        "Score test pass rate, defects, coverage, performance, and risk.",
+        "Identify blockers and watch items.",
+        "Generate executive narrative.",
+        "Return go or no-go decision with actions."
+      ],
+      "systemPrompt": "You are a release quality analyst. Be transparent about scoring, blockers, assumptions, and risk tradeoffs.",
+      "taskPrompt": "Calculate a release readiness score from 0 to 100. Provide go or no-go, scoring breakdown, top risks, blockers, mitigation plan, and minimum criteria to proceed.",
+      "sampleInput": {
+        "passRate": "94%",
+        "criticalBugs": 0,
+        "highBugs": 3,
+        "coverage": "78%",
+        "performance": "p95 checkout latency 900ms against 750ms target"
+      }
+    },
+    {
+      "id": "ai-test-case-generator",
+      "kind": "tool",
+      "title": "AI Test Case Generator",
+      "category": "Testing Tool",
+      "status": "ready",
+      "summary": "Converts PRDs, Jira stories, or Figma notes into executable test cases with priority labels.",
+      "objective": "Provide a production-ready test design tool for manual QA, QA leads, and SDETs.",
+      "primaryUseCase": "A user pastes a PRD or story and receives P0 to P3 cases, Gherkin scenarios, and export-ready JSON.",
+      "inputs": [
+        "PRD",
+        "Jira story",
+        "Figma notes",
+        "business rules",
+        "target format"
+      ],
+      "outputs": [
+        "test cases",
+        "Gherkin",
+        "priority matrix",
+        "edge cases",
+        "export JSON"
+      ],
+      "integrations": [
+        "Jira",
+        "TestRail",
+        "Zephyr",
+        "Google Sheets"
+      ],
+      "workflow": [
+        "Extract requirements, flows, validations, and dependencies.",
+        "Generate positive, negative, edge, boundary, security, and accessibility scenarios.",
+        "Prioritize and map cases to requirements.",
+        "Format output for the selected tool.",
+        "Return coverage gaps and review notes."
+      ],
+      "systemPrompt": "You are a senior QA engineer building executable test cases from requirements.",
+      "taskPrompt": "Generate comprehensive test cases from the supplied requirement. Include priorities P0-P3, preconditions, test data, steps, expected results, Gherkin, and export-ready JSON.",
+      "sampleInput": {
+        "prd": "Users can reset password using email OTP. OTP expires after 10 minutes.",
+        "format": "Gherkin and JSON"
+      }
+    },
+    {
+      "id": "dom-screenshot-ui-test-generator",
+      "kind": "tool",
+      "title": "DOM and Screenshot UI Test Generator",
+      "category": "Testing Tool",
+      "status": "ready",
+      "summary": "Creates UI test steps, resilient selectors, and Playwright or Cypress code from DOM and screenshot context.",
+      "objective": "Help automation engineers generate stable UI tests directly from real pages.",
+      "primaryUseCase": "A tester provides a DOM snapshot and screenshot notes. The tool returns selectors, assertions, and runnable UI test code.",
+      "inputs": [
+        "DOM snapshot",
+        "screenshot notes",
+        "user flow",
+        "target framework",
+        "assertion goals"
+      ],
+      "outputs": [
+        "selectors",
+        "UI test code",
+        "assertions",
+        "visual checkpoints",
+        "fragility warnings"
+      ],
+      "integrations": [
+        "Playwright",
+        "Cypress",
+        "Selenium",
+        "Chrome DevTools"
+      ],
+      "workflow": [
+        "Identify stable locators from DOM and accessible names.",
+        "Map user flow to automation steps.",
+        "Add assertions from visible UI states.",
+        "Generate framework-specific test code.",
+        "Return selector confidence and maintenance notes."
+      ],
+      "systemPrompt": "You are a UI automation expert. Prefer resilient, user-facing locators and readable tests.",
+      "taskPrompt": "Generate a UI automation test from the supplied DOM, screenshot context, and flow. Include selectors, assertions, code, visual checkpoints, and warnings for fragile areas.",
+      "sampleInput": {
+        "framework": "Playwright",
+        "dom": "<label>Email</label><input id=\"email\"><button data-testid=\"continue\">Continue</button>",
+        "flow": "enter email and continue"
+      }
+    },
+    {
+      "id": "bug-triage-root-cause-analyzer",
+      "kind": "tool",
+      "title": "AI Bug Triage and Root Cause Analyzer",
+      "category": "Testing Tool",
+      "status": "ready",
+      "summary": "Analyzes failed tests, logs, screenshots, and network notes to classify likely root cause and owner.",
+      "objective": "Cut triage time by clustering failures and creating actionable bug investigation summaries.",
+      "primaryUseCase": "A CI pipeline sends failure logs. The tool returns likely root cause, owner, severity, duplicate hints, and next debug steps.",
+      "inputs": [
+        "failure logs",
+        "stack traces",
+        "screenshots notes",
+        "network calls",
+        "recent changes"
+      ],
+      "outputs": [
+        "root cause category",
+        "owner suggestion",
+        "severity",
+        "debug plan",
+        "bug report draft"
+      ],
+      "integrations": [
+        "Jira",
+        "GitHub Actions",
+        "Jenkins",
+        "Slack"
+      ],
+      "workflow": [
+        "Parse failure signals and normalize evidence.",
+        "Cluster related failures by message and context.",
+        "Classify frontend, backend, infrastructure, data, or test issue.",
+        "Recommend owner and next debug steps.",
+        "Return bug-ready report and confidence."
+      ],
+      "systemPrompt": "You are a bug triage specialist. Use the provided evidence to classify probable root cause and next steps. Distinguish product defects from test issues.",
+      "taskPrompt": "Analyze the failure context. Provide root cause category, evidence, owner suggestion, severity, confidence, immediate debug steps, and a concise Jira bug draft.",
+      "sampleInput": {
+        "logs": "Expected status 200 but received 500 on POST /checkout. Stack trace shows PaymentGatewayTimeout.",
+        "recentChanges": "Payment retry logic merged yesterday"
+      }
+    }
+  ]
+}

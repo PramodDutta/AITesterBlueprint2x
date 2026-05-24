@@ -1,0 +1,163 @@
+{
+  "name": "AIQA AGENT - Flaky Test Detector Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aiqa/flaky-test-detector",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ba5189a0-b63b-2c30-6f3b-44908e85c1f9",
+      "name": "Project Intake Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        0
+      ],
+      "webhookId": "4be3204f-24d0-9d39-6150-23498e89ee94"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\nreturn [{\n  json: {\n    projectId: \"flaky-test-detector\",\n    title: \"Flaky Test Detector Agent\",\n    provider: body.provider ?? process.env.AIQA_PROVIDER ?? \"groq\",\n    model: body.model ?? process.env.AIQA_MODEL ?? \"\",\n    input: body.input ?? body,\n    wrapperUrl: body.wrapperUrl ?? process.env.AIQA_WRAPPER_URL ?? \"http://host.docker.internal:8787/api/run\"\n  }\n}];"
+      },
+      "id": "8489519e-ded7-2baa-7ede-5669bcf6895f",
+      "name": "Normalize AIQA Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.wrapperUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ projectId: $json.projectId, provider: $json.provider, model: $json.model, input: $json.input }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "0eecccbf-8a68-2eda-7e45-2c0fbd219312",
+      "name": "Call Multi Provider AI Wrapper",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $json;\nreturn [{\n  json: {\n    projectId: \"flaky-test-detector\",\n    title: \"Flaky Test Detector Agent\",\n    provider: response.provider ?? \"ai-wrapper\",\n    model: response.model ?? \"\",\n    output: response.output ?? response.content ?? response.message ?? response,\n    usage: response.usage ?? null,\n    generatedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "97fe359c-f10f-480c-5b4a-2facf7dd1749",
+      "name": "Shape QA Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "00e7a630-ff53-46ba-af72-65ce3c212cdc",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Project Intake Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize AIQA Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize AIQA Request": {
+      "main": [
+        [
+          {
+            "node": "Call Multi Provider AI Wrapper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Multi Provider AI Wrapper": {
+      "main": [
+        [
+          {
+            "node": "Shape QA Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape QA Output": {
+      "main": [
+        [
+          {
+            "node": "Return Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "AI Tester Blueprint 2x"
+    },
+    {
+      "name": "agent"
+    }
+  ],
+  "meta": {
+    "projectId": "flaky-test-detector",
+    "wrapperRequired": true,
+    "wrapperUrlEnv": "AIQA_WRAPPER_URL",
+    "samplePayload": {
+      "provider": "groq",
+      "input": {
+        "history": "checkout.spec.ts passed 12/20, failed mostly on WebKit after 30s timeout; login.spec.ts passed 19/20",
+        "logs": "Timeout waiting for networkidle"
+      }
+    }
+  }
+}

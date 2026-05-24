@@ -1,0 +1,89 @@
+{
+  "name": "AIQA AGENT - Accessibility Auditor Agent",
+  "description": "Audits UI code or page descriptions against WCAG, ARIA, keyboard, and screen reader expectations. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "accessibility-auditor",
+    "kind": "agent",
+    "category": "Accessibility",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "html": "<button><span></span></button><input placeholder=\"Email\">",
+      "target": "WCAG 2.2 AA"
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "Accessibility Auditor Agent Input",
+        "input_type": "textarea",
+        "value": "{\n  \"html\": \"<button><span></span></button><input placeholder=\\\"Email\\\">\",\n  \"target\": \"WCAG 2.2 AA\"\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are a WCAG 2.2 AA accessibility expert. Provide specific issues, impact, and fixes without overstating what cannot be verified from the input.\n\nProject: Accessibility Auditor Agent\nObjective: Help QA and developers detect accessibility defects early and produce actionable fixes.\nPrimary use case: A tester provides HTML, DOM snippets, or screenshots notes and receives an accessibility report with severity and code fixes.\n\nRequired task:\nAudit the supplied UI context. Report accessibility defects with WCAG references, severity, affected users, fix recommendation, code snippet when possible, and retest steps.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "Accessibility Auditor Agent Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}

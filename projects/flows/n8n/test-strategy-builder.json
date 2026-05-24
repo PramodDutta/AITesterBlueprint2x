@@ -1,0 +1,166 @@
+{
+  "name": "AIQA AGENT - Test Strategy Builder Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aiqa/test-strategy-builder",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "15059df7-b722-b79e-f031-fde1199ef0e9",
+      "name": "Project Intake Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        0
+      ],
+      "webhookId": "99dc0fd9-c437-43d9-f16b-218349dc77a5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\nreturn [{\n  json: {\n    projectId: \"test-strategy-builder\",\n    title: \"Test Strategy Builder Agent\",\n    provider: body.provider ?? process.env.AIQA_PROVIDER ?? \"groq\",\n    model: body.model ?? process.env.AIQA_MODEL ?? \"\",\n    input: body.input ?? body,\n    wrapperUrl: body.wrapperUrl ?? process.env.AIQA_WRAPPER_URL ?? \"http://host.docker.internal:8787/api/run\"\n  }\n}];"
+      },
+      "id": "a411d134-d6f8-0672-b9e1-fca7a4bfb86d",
+      "name": "Normalize AIQA Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.wrapperUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ projectId: $json.projectId, provider: $json.provider, model: $json.model, input: $json.input }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "d55a3dde-3b40-4ed3-8c57-24037f600690",
+      "name": "Call Multi Provider AI Wrapper",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $json;\nreturn [{\n  json: {\n    projectId: \"test-strategy-builder\",\n    title: \"Test Strategy Builder Agent\",\n    provider: response.provider ?? \"ai-wrapper\",\n    model: response.model ?? \"\",\n    output: response.output ?? response.content ?? response.message ?? response,\n    usage: response.usage ?? null,\n    generatedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "f7bfcae4-d450-8648-1fa2-76127dd78abf",
+      "name": "Shape QA Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "6b068204-909b-e5c4-0087-cf2b8b2229e0",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Project Intake Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize AIQA Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize AIQA Request": {
+      "main": [
+        [
+          {
+            "node": "Call Multi Provider AI Wrapper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Multi Provider AI Wrapper": {
+      "main": [
+        [
+          {
+            "node": "Shape QA Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape QA Output": {
+      "main": [
+        [
+          {
+            "node": "Return Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "AI Tester Blueprint 2x"
+    },
+    {
+      "name": "agent"
+    }
+  ],
+  "meta": {
+    "projectId": "test-strategy-builder",
+    "wrapperRequired": true,
+    "wrapperUrlEnv": "AIQA_WRAPPER_URL",
+    "samplePayload": {
+      "provider": "groq",
+      "input": {
+        "projectName": "Fintech onboarding revamp",
+        "techStack": "React, Node.js, PostgreSQL, REST APIs",
+        "timeline": "4 weeks",
+        "team": "2 manual QA, 1 SDET",
+        "risks": "KYC failures, payment gateway errors, mobile browser layout"
+      }
+    }
+  }
+}

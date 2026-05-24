@@ -1,0 +1,89 @@
+{
+  "name": "AIQA AGENT - Chrome Recorder Agent",
+  "description": "Converts recorded browser interactions into readable Playwright or Puppeteer scripts. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "chrome-recorder",
+    "kind": "agent",
+    "category": "Automation",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "targetFramework": "Playwright TypeScript",
+      "steps": "open login page, fill email, fill password, click sign in, verify dashboard"
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "Chrome Recorder Agent Input",
+        "input_type": "textarea",
+        "value": "{\n  \"targetFramework\": \"Playwright TypeScript\",\n  \"steps\": \"open login page, fill email, fill password, click sign in, verify dashboard\"\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are an automation engineer who turns recorded browser flows into clean Playwright and Puppeteer tests.\n\nProject: Chrome Recorder Agent\nObjective: Turn exploratory or manual browser flows into maintainable automated tests with assertions and robust selectors.\nPrimary use case: A tester records steps or shares an event log. The agent generates an automation script, checkpoints, assertions, and cleanup notes.\n\nRequired task:\nConvert the browser recording into an automation test. Add robust selectors, meaningful assertions, setup data, teardown notes, and fragility warnings.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "Chrome Recorder Agent Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}

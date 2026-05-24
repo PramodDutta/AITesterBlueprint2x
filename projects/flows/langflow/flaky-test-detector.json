@@ -1,0 +1,89 @@
+{
+  "name": "AIQA AGENT - Flaky Test Detector Agent",
+  "description": "Analyzes test history and failure context to identify unstable tests and recommend fixes. Uses a prompt template plus configurable chat model. OpenAI-compatible providers can use OpenAI, Groq, OpenRouter, Ollama, or LM Studio base URLs. Anthropic users can swap the chat model component in LangFlow.",
+  "metadata": {
+    "projectId": "flaky-test-detector",
+    "kind": "agent",
+    "category": "Debugging",
+    "providerSupport": [
+      "OpenAI",
+      "Groq via OpenAI-compatible base URL",
+      "OpenRouter via OpenAI-compatible base URL",
+      "Ollama via local OpenAI-compatible endpoint",
+      "LM Studio via local OpenAI-compatible endpoint",
+      "Anthropic by replacing the chat model node"
+    ],
+    "sampleInput": {
+      "history": "checkout.spec.ts passed 12/20, failed mostly on WebKit after 30s timeout; login.spec.ts passed 19/20",
+      "logs": "Timeout waiting for networkidle"
+    }
+  },
+  "nodes": [
+    {
+      "id": "project-input",
+      "type": "TextInput",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "Flaky Test Detector Agent Input",
+        "input_type": "textarea",
+        "value": "{\n  \"history\": \"checkout.spec.ts passed 12/20, failed mostly on WebKit after 30s timeout; login.spec.ts passed 19/20\",\n  \"logs\": \"Timeout waiting for networkidle\"\n}"
+      }
+    },
+    {
+      "id": "prompt-template",
+      "type": "PromptTemplate",
+      "position": {
+        "x": 420,
+        "y": 200
+      },
+      "data": {
+        "template": "You are a CI test stability specialist. Diagnose flaky tests using evidence, not guesses. Prefer deterministic fixes over blanket retries.\n\nProject: Flaky Test Detector Agent\nObjective: Stabilize CI by separating real product defects from timing, data, environment, and dependency flakes.\nPrimary use case: A QA lead provides recent CI history. The agent ranks flaky tests, clusters failure patterns, and recommends fixes.\n\nRequired task:\nAnalyze the test history and failure logs. Identify flaky tests, classify root causes, rank by pipeline impact, recommend fixes, and provide a retry policy only where justified.\n\nRequired output:\n- Start with an executive summary.\n- Include assumptions and missing information.\n- Provide concrete QA artifacts that can be copied into a real workflow.\n- Include an implementation checklist.\n- Return Markdown first, then a compact JSON summary.\n\nUser input:\n{project_input}",
+        "variables": [
+          "project_input"
+        ]
+      }
+    },
+    {
+      "id": "chat-model",
+      "type": "ChatOpenAI",
+      "position": {
+        "x": 760,
+        "y": 200
+      },
+      "data": {
+        "model_name": "gpt-4o-mini",
+        "temperature": 0.2,
+        "max_tokens": 5000,
+        "openai_api_base_note": "Set base URL for Groq, OpenRouter, Ollama, or LM Studio when using OpenAI-compatible mode."
+      }
+    },
+    {
+      "id": "project-output",
+      "type": "TextOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "label": "Flaky Test Detector Agent Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-input",
+      "target": "prompt-template"
+    },
+    {
+      "source": "prompt-template",
+      "target": "chat-model"
+    },
+    {
+      "source": "chat-model",
+      "target": "project-output"
+    }
+  ]
+}
