@@ -682,7 +682,7 @@ pip install deepeval requests
 | :--- | :--- |
 | `SKILL.md` | Tiered-model-orchestration skill (orchestrator on Opus/Fable, subagents on Sonnet/Haiku) — used to keep evaluation runs cheap |
 
-> Fine-tuning content moved to [Chapter 17](#-chapter-17-fine-tuning-open-source-models-on-your-own-data) so this chapter stays focused on evaluation.
+> Fine-tuning content moved to [Chapter 17](#-chapter-17-fine-tuning-open-source-models-on-your-own-data) so this chapter stays focused on evaluation. Hands-on DeepEval exercises live in [Chapter 18](#-chapter-18-deepeval-exercises--llm-as-judge-evaluation).
 
 ---
 
@@ -718,6 +718,70 @@ Take a free, open-source LLM (Qwen2.5-Coder, Llama 3, Mistral, Phi, ...) and ada
 Ollama (`qwen2.5-coder:14b` + `nomic-embed-text`) → LanceDB / Chroma vector store → Python glue (`index_repo.py`, `ask.py`). Optional LoRA via MLX-LM (Mac) or Unsloth (CUDA). Everything offline.
 
 See [`Chapter_17_Fine_Tuning/README.md`](Chapter_17_Fine_Tuning/README.md) and [`Fine_TUNE_Instructions.md`](Chapter_17_Fine_Tuning/Fine_TUNE_Instructions.md) for the full Qwen2.5-Coder + Ollama recipe.
+
+---
+
+## 📖 Chapter 18: DeepEval Exercises — LLM-as-Judge Evaluation
+
+**Directory:** `Chapter_18_DeepEval/`
+
+Hands-on exercises with the [DeepEval](https://github.com/confident-ai/deepeval) evaluation framework. Each test sends a real prompt to a real LLM, then a **separate judge LLM** scores the answer using metrics like `AnswerRelevancyMetric` and `HallucinationMetric`. Push optional to the Confident AI dashboard for history + drift tracking.
+
+### Setup
+
+```bash
+cd Chapter_18_DeepEval
+python3 -m venv venv && source venv/bin/activate
+# deepeval 4.0.6 has a packaging bug ("No module named 'deepeval.deepeval'");
+# pin to <4 for now.
+pip install "deepeval<4" requests openai python-dotenv
+```
+
+`.env.local` (gitignored — never commit) keys:
+
+```
+OPENAI_API_KEY=sk-...
+GROQ_API_KEY=gsk_...
+OPENROUTER_API_KEY=sk-or-v1-...
+CONFIDENT_API_KEY=confident-...     # optional, only if pushing to the cloud dashboard
+```
+
+### Exercises
+
+| File | Model under test | Judge | What it teaches |
+| :--- | :--- | :--- | :--- |
+| `exercises/test_01_Basic_Anwser_Relevancy.py` | hard-coded answer string | default (OpenAI) | The two foundational metrics — AnswerRelevancy + Hallucination. `LLMTestCase` shape, `assert_test`, the `context=[...]` requirement for Hallucination. |
+| `exercises/test_02_Groq_Llama4_vs_GPT41_Judge.py` | Groq `meta-llama/llama-4-scout-17b-16e-instruct` | OpenAI `gpt-4.1` | Real Groq call via OpenAI-compatible endpoint; pass `model="gpt-4.1"` to each metric to choose the judge. |
+| `exercises/test_03_OpenRouter_Llama4_vs_GPT41_Judge.py` | OpenRouter `meta-llama/llama-4-scout` | OpenAI `gpt-4.1` | Same shape as Exercise 2, but via the OpenRouter gateway — shows how easy it is to swap providers (only base URL, model id, key change). |
+
+All three follow the same pattern:
+
+```mermaid
+flowchart LR
+    Q[Prompt] --> M[Model under test]
+    M --> A[Answer]
+    A --> J[Judge LLM<br/>via DeepEval metrics]
+    J --> R[Pass/Fail + Score + Reason]
+
+    style M fill:#fef3c7,stroke:#92400e
+    style J fill:#e8f5e9,stroke:#2e7d32
+    style R fill:#ede7f6,stroke:#4527a0,stroke-width:2px
+```
+
+### Run a single test
+
+```bash
+deepeval test run exercises/test_02_Groq_Llama4_vs_GPT41_Judge.py -d all -v
+```
+
+DeepEval requires the `test_` filename prefix; that's why Exercise 1 was renamed from `01_*` to `test_01_*`.
+
+### Gotchas already worked through
+
+- **deepeval 4.0.6 packaging bug:** internal `deepeval.deepeval` import is missing. Pin `deepeval<4`.
+- **`HallucinationMetric` needs `context=[...]`** on the `LLMTestCase`, otherwise it throws.
+- **macOS DNS cache:** Python's `getaddrinfo()` can keep a stale negative entry for `api.confident-ai.com`. Fix once with `sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder`.
+- **Push to Confident AI:** set `CONFIDENT_API_KEY` in `.env.local`; `deepeval test run` auto-uploads when present.
 
 ---
 
