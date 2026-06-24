@@ -789,22 +789,25 @@ DeepEval requires the `test_` filename prefix; that's why Exercise 1 was renamed
 
 **Directory:** `Chapter_19_DeepEval_Framework/`
 
-A full, end-to-end evaluation harness built around two **real, runnable apps under test** and a switchable LLM-as-judge framework. Where Chapter 18 evaluates single prompts, Chapter 19 evaluates **live production-shaped systems** — a customer-support chatbot and a complete RAG pipeline — using DeepEval metrics for relevancy, faithfulness, grounding, hallucination, bias, and toxicity.
+A full, end-to-end evaluation harness built around **three real, runnable apps under test** and a switchable LLM-as-judge framework. Where Chapter 18 evaluates single prompts, Chapter 19 evaluates **live production-shaped systems** — a customer-support chatbot, a complete RAG pipeline, and a live third-party black-box bot — using DeepEval metrics for relevancy, faithfulness, grounding, hallucination, bias, toxicity, and PII leakage.
 
-Three subsystems:
+The framework (Subsystem C) drives three targets:
 
 ```mermaid
 flowchart LR
     A["Subsystem A<br/>ShopSphere Chatbot<br/>React + FastAPI + Groq"]
     B["Subsystem B<br/>RAG Explorer<br/>Ollama embed + Chroma + Groq"]
+    BB["Subsystem BB<br/>BrowserBash live bot<br/>aleeup.com · DeepSeek (black box)"]
     C["Subsystem C<br/>DeepEval Framework<br/>switchable judge LLM"]
 
     C -->|HTTP| A
     C -->|HTTP| B
-    C --> R["Pass/Fail + Score + Reason<br/>reports/report.html"]
+    C -->|HTTP| BB
+    C --> R["Pass/Fail + Score + Reason<br/>dashboard :8203"]
 
     style A fill:#fef3c7,stroke:#92400e
     style B fill:#e3f2fd,stroke:#1565c0
+    style BB fill:#fce4ec,stroke:#ad1457
     style C fill:#e8f5e9,stroke:#2e7d32
     style R fill:#ede7f6,stroke:#4527a0,stroke-width:2px
 ```
@@ -854,6 +857,10 @@ uvicorn app:app --reload --port 8202
 
 Open <http://localhost:8202>. Pages: `/` dashboard, `/ingest` (seed bundled corpus + upload PDF/MD/TXT), `/search` (pure retrieval with ranked hits), `/chat` (full RAG with the retrieval panel exposed). Bundled corpus: 5 e-commerce knowledge files (refund, shipping, return policies, product catalog, FAQ).
 
+### Subsystem BB — Live BrowserBash bot (black-box target)
+
+A **third, fully external target**: the live BrowserBash support bot hosted on `aleeup.com` (answered server-side by DeepSeek — we never see the model, we treat the bot as a black box over HTTP). This is the realistic case: evaluating a vendor chatbot you *don't* control. The client (`targets/aleepup_browserbash.py`) posts `{"message", "visitorId"}` and gets back **plain text** (not JSON). Backed by 14 goldens + safety/PII probes, 7 registry rows, and 7 pytest suites in `tests/aleepup-browserbash-chatbot/`.
+
 ### Subsystem C — `03_DeepFramework/` DeepEval Framework
 
 The evaluation harness that points DeepEval metrics at the two live apps. **Switchable judge LLM** via `JUDGE_PROVIDER` — the same `CompatibleJudge` class works for all three because OpenAI, Groq, and Ollama expose an OpenAI-compatible endpoint (`instructor` handles structured output uniformly):
@@ -862,20 +869,21 @@ The evaluation harness that points DeepEval metrics at the two live apps. **Swit
 - `groq` → `GROQ_API_KEY`, `openai/gpt-oss-120b` (override `JUDGE_MODEL_GROQ`)
 - `ollama` → local Ollama at `http://localhost:11434/v1`, `gpt-oss:20b` (override `JUDGE_MODEL_OLLAMA`)
 
-**Two ways to run the same metric registry** (one source of truth in `dashboard/registry.py` — 22 metric × target rows):
+**Two ways to run the same metric registry** (one source of truth in `dashboard/registry.py` — 29 metric × target rows: 10 chatbot, 11 RAG, 7 BrowserBash, 1 synthetic):
 
 ```bash
 cd 03_DeepFramework
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-# Subsystems A (:8201) and B (:8202) must be running first; .env is auto-loaded
+# Targets must be running first (A :8201, B :8202; BB is live on aleeup.com); .env is auto-loaded
 
-# 1) pytest — CI-style, per-golden cases
+# 1) pytest — CI-style, per-golden cases. Suites live under tests/<target>/
 export JUDGE_PROVIDER=openai          # or groq / ollama
-pytest tests/test_01_chatbot_answer_relevancy.py -v
+pytest tests/chatbot/ -v              # or tests/rag/  ·  tests/aleepup-browserbash-chatbot/
+pytest -m "chatbot and quality" -v   # or filter by marker
 
 # 1b) push results to the Confident AI cloud dashboard
-deepeval test run tests/test_01_chatbot_answer_relevancy.py   # needs CONFIDENT_API_KEY
+deepeval test run tests/chatbot/test_01_chatbot_answer_relevancy.py   # needs CONFIDENT_API_KEY
 
 # 2) interactive local dashboard on :8203 — click any metric, live pass/fail/score/reason
 uvicorn dashboard.app:app --port 8203
@@ -884,12 +892,14 @@ open http://localhost:8203
 
 | Piece | What |
 |-------|------|
-| `conftest.py` | loads `.env`, builds the judge from `JUDGE_PROVIDER`, exposes `chatbot` / `rag` / `judge` / golden fixtures, auto-skips when a target app is down |
-| `pytest.ini` | markers (`chatbot`, `rag`, `quality`, `safety`, `slow`, `needs_chatbot`, `needs_rag`) |
-| `dashboard/` | FastAPI app (`:8203`) that drives the registry interactively + switches judge provider live |
-| `datasets/` | `chatbot_goldens.py` (19 goldens + 13 safety prompts), `rag_goldens.py` (8 goldens) |
+| `conftest.py` | loads `.env`, builds the judge from `JUDGE_PROVIDER`, exposes `chatbot` / `rag` / `browserbash` / `judge` / golden fixtures, auto-skips when a target is down, and mirrors every pytest / `deepeval test run` session into the local run store |
+| `pytest.ini` | markers (`chatbot`, `rag`, `browserbash`, `quality`, `safety`, `retrieval`, `geval`, `conversational`, `slow`, `needs_chatbot`, `needs_rag`, `needs_browserbash`) |
+| `dashboard/` | FastAPI app (`:8203`) with a TTA-themed sidebar and 4 panels: **Overview** analytics, editable **Golden Datasets**, **Run Metrics** (interactive, switch judge live), and local **Runs & Logs** capture (`runs_store`) — no Confident AI round-trip needed |
+| `datasets/` | `chatbot_goldens.py` (19 + 13 safety), `rag_goldens.py` (8), `aleepup_browserbash_goldens.py` (14 + safety/PII) |
 | `llm_providers/` | `CompatibleJudge` + `JUDGE_PROVIDER` factory |
-| `targets/` | HTTP clients for the chatbot and RAG apps |
+| `targets/` | HTTP clients for the chatbot, RAG, and live BrowserBash bot |
+| `docs/index.html` | self-contained animated overview of the whole framework (open in a browser) |
+| `tests/` | `chatbot/` · `rag/` · `aleepup-browserbash-chatbot/` (7 per-metric suites each) + `test_00_smoke.py` |
 
 | Scoring direction | Metrics |
 |-------------------|---------|
@@ -904,6 +914,23 @@ open http://localhost:8203
 - The chatbot and RAG apps were verified live: chatbot answers shipping/returns questions via Groq; RAG seeds 21 chunks from 5 docs and returns grounded, source-cited answers.
 - The dashboard was verified end-to-end against both apps (e.g. `chatbot.answer_relevancy` → 1.0 pass, `rag.contextual_recall` → 1.0 pass) with the Groq and OpenAI judges.
 - **Judge rate limits:** Groq's free tier caps `gpt-oss-120b` at 8000 TPM, which `deepeval test run` can exceed when it fans out judge calls. Use the OpenAI judge (`JUDGE_PROVIDER=openai`, `gpt-4o-mini`) for large runs.
+
+---
+
+## 📖 Chapter 20: BrowserBash — Natural-Language E2E Test Journeys
+
+**Directory:** `Chapter_20_Browserbash/`
+
+BrowserBash drives a real browser through an **end-to-end journey written in plain English** — no selectors, no Playwright script. You describe the flow; the agent executes and verifies each step, then writes back a result report.
+
+| File | What |
+|------|------|
+| `TTA-Cart.md` | The journey spec — a TTACart login → add-to-cart → checkout → "Thank you for your order!" flow against `app.thetestingacademy.com/playwright/ttacart` |
+| `Result.md` | The run report — status, duration, steps executed, and a step-by-step summary |
+
+Example outcome from `Result.md`: **passed** in 118.5s, 22 steps executed — logged in as `standard_user`, added the *Test.allTheThings() T-Shirt (Red)*, verified a 1-item cart, completed checkout, and confirmed the order-complete heading.
+
+This pairs with Chapter 19: the same live BrowserBash bot is also an evaluation *target* (Subsystem BB) there, so you both **drive** it (Chapter 20) and **grade** it (Chapter 19).
 
 ---
 
